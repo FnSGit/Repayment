@@ -11,7 +11,7 @@ public class BatchTaskExecutor extends TaskExecutor{
     }
 
     public void batchExecute(List<Task> taskList) {
-        for (Task entity:taskList)
-            executorService.execute(entity);
+        for (Task task:taskList)
+            executorService.execute(task);
     }
 }

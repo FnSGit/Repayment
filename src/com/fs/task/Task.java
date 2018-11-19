@@ -1,8 +1,7 @@
 package com.fs.task;
 
 import com.fs.busi.BusiProcess;
-import com.fs.entity.TaskEntity;
-import com.fs.repayment.Param.GroupParam;
+import com.fs.Param.Group;
 import com.fs.util.log.FsLogger;
 
 import java.io.File;
@@ -10,21 +9,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Task implements Runnable{
-    protected  TaskEntity entity;
+    protected  String taskName;
     protected BusiProcess process;
-    protected GroupParam param;
+    protected Group param;
 
-    public Task(TaskEntity entity, BusiProcess process, GroupParam param) {
-       this.entity=entity;
+    protected List<Group> groups;
+    public Task(String taskName, BusiProcess process, Group param) {
+       this.taskName = taskName;
        this.process=process;
        this.param=param;
     }
 
+    public Task(String taskName, BusiProcess process, List<Group> groups) {
+        this.taskName = taskName;
+        this.process=process;
+        this.groups = groups;
+    }
     @Override
     public void run() {
         //初始化
-        FsLogger logger = FsLogger.getLogger(entity.getClassName());
-        logger.setLogPath("log"+File.separator+entity.getTaskName());
+        FsLogger logger = FsLogger.getLogger(taskName);
+        logger.setLogPath("log"+File.separator+ taskName);
 
        start();
         process.process(process.initGroup(param));
@@ -32,20 +37,23 @@ public class Task implements Runnable{
     }
 
     private void end() {
-        System.out.println("任务：【"+entity.getTaskName()+"】  片段id："+param.getGroupId()+"，结束···");
+        System.out.println("任务：【"+ taskName+"】  片段id："+param.getGroupId()+"，结束···");
     }
 
     private void start() {
-        System.out.println("任务：【"+entity.getTaskName()+"】  片段id："+param.getGroupId()+"，开始···");
+        System.out.println("任务：【"+ taskName+"】  片段id："+param.getGroupId()+"，开始···");
     }
 
     public  List<Task> taskFactroy() {
         List<Task> taskList = new ArrayList<>();
-        List<String> groups= param.getGroupIdList();
-        for (String id:groups){
-
-        }
-
+//        List<String> groups= param.getGroupIdList();
+       /* for (String id:groups){
+            param.setGroupId(id);
+            Task task = new Task(taskName, process, param);
+            taskList.add(task);
+        }*/
+       for (Group group : groups)
+           taskList.add(new Task(taskName, process, group));
         return taskList;
     }
 }

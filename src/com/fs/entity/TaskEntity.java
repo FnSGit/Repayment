@@ -5,8 +5,8 @@ public class TaskEntity {
     protected String className;
     protected String groupId;
 
-    public TaskEntity(String taskName) {
-        this.taskName = taskName;
+    public TaskEntity(String groupId) {
+        this.groupId = groupId;
     }
 
     public String getTaskName() {

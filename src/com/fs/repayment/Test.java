@@ -5,7 +5,7 @@ import com.fs.busi.RepaymentBusi;
 import com.fs.entity.TaskEntity;
 import com.fs.pool.BatchTaskExecutor;
 import com.fs.pool.TaskExecutor;
-import com.fs.repayment.Param.GroupParam;
+import com.fs.Param.Group;
 import com.fs.task.Task;
 
 import java.util.ArrayList;
@@ -23,11 +23,11 @@ public class Test {
         BusiProcess process=new RepaymentBusi();
 
         List<String> groups = new ArrayList<>();
-        groups.add("100");
-        groups.add("10");
-        GroupParam param=new GroupParam(groups);
+        groups.add("11");
+        groups.add("20");
+        List<Group> param = Group.groupParamBuild(groups);
 
-        Task task = new Task(entity,process,param);
+        Task task = new Task("还款计划",process,param);
 ////        executor.execute(task1);
         ((BatchTaskExecutor) executor).batchExecute(task.taskFactroy());
 

@@ -1,20 +1,24 @@
-package com.fs.repayment.Param;
+package com.fs.Param;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class GroupParam {
+public class Group {
 
     protected String groupId;
 
     protected List<String> groupIdList;
 
 
-    public GroupParam(String groupId) {
+    public Group(String groupId) {
         this.groupId = groupId;
     }
 
-    public GroupParam(List<String> groupIdList) {
-       this.groupIdList=groupIdList;
+    public static List<Group> groupParamBuild(List<String> groupIdList) {
+        List<Group> groupList = new ArrayList<>();
+        for (String id:groupIdList)
+            groupList.add(new Group(id));
+        return groupList;
     }
     public String getGroupId() {
         return groupId;
