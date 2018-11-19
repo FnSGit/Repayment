@@ -9,7 +9,7 @@ public class TaskExecutor {
     public static final int ExecutorService_single=2;
     public static final int ExecutorService_cached=3;
     public static final int ExecutorService_scheduled=4;
-    private ExecutorService executorService;
+    protected ExecutorService executorService;
     public TaskExecutor(int poolSize, int executorService_Type) throws Exception {
         switch (executorService_Type) {
             case ExecutorService_scheduled:
