@@ -1,9 +1,9 @@
 package com.fs.repayment;
 
-import com.fs.Param.Group;
-import com.fs.Param.RepaymentGroup;
+import com.fs.group.Group;
+import com.fs.group.RepaymentGroup;
 import com.fs.busi.BusiProcess;
-import com.fs.busi.RepaymentBusi;
+import com.fs.busi.repayment.RepaymentBusi;
 import com.fs.pool.BatchTaskExecutor;
 import com.fs.pool.TaskExecutor;
 import com.fs.task.Task;

@@ -1,12 +1,15 @@
-package com.fs.busi;
+package com.fs.busi.repayment;
 
-import com.fs.Param.Group;
+import com.fs.group.Group;
+import com.fs.busi.BusiProcess;
 import com.fs.entity.TaskEntity;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.util.db.DataBase;
 import com.fs.util.log.FsLogger;
 import com.fs.util.object.ObjectUtil;
+import com.fs.util.test.YizhiHkjihuaObj;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,7 +25,7 @@ public class RepaymentBusi extends BusiProcess {
           for (TaskEntity entity:data) {
               YizhiFkxxObj fkxxObj= (YizhiFkxxObj) entity;
               logger.debug("开始执行组id:{},数据:{}" ,fkxxObj.getGroupId(),fkxxObj.getOrderno());
-
+              hkjhProsess(fkxxObj);
               logger.debug("结束执行组id:{},数据:{}" ,fkxxObj.getGroupId(),fkxxObj.getOrderno());
           }
             Thread.sleep(1000);
@@ -43,6 +46,7 @@ public class RepaymentBusi extends BusiProcess {
             while (resultSet.next()) {
                 TaskEntity taskEntity = (TaskEntity) ObjectUtil.loadResult(YizhiFkxxObj.class,resultSet);
                 taskEntity.setGroupId(param.getGroupId());
+                taskEntity.setGroup(param);
                 taskEntityList.add(taskEntity);
             }
         } catch (SQLException e) {
@@ -52,6 +56,15 @@ public class RepaymentBusi extends BusiProcess {
     }
 
     private void hkjhProsess(TaskEntity entity) {
+        YizhiFkxxObj fkxx= (YizhiFkxxObj) entity;
+        BigDecimal zerBigDecimal=BigDecimal.ZERO;
+
+        String sOrderNo=fkxx.getOrderno();//订单号
+        double dfkje=Double.parseDouble(fkxx.getFkje());
+        int hxfs=Integer.parseInt(fkxx.getHxfs());
+        int kouxifs=Integer.parseInt(fkxx.getKouxifs());
+
+        List<YizhiHkjihuaObj> lstHkjihua=getPayPlan(fkxx);
 
     }
 }

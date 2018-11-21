@@ -1,7 +1,7 @@
 package com.fs.task;
 
 import com.fs.busi.BusiProcess;
-import com.fs.Param.Group;
+import com.fs.group.Group;
 import com.fs.util.log.FsLogger;
 
 import java.io.File;
