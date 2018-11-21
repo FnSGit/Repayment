@@ -1,27 +1,54 @@
 package com.fs.Param;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class Group {
+public abstract class Group {
 
     protected String groupId;
+    protected String groupName;
+    protected String dbPool;
+    protected String tableName;
 
     protected List<String> groupIdList;
 
 
-    public Group(String groupId) {
+    public Group(String groupId, String dbPool, String tableName) {
         this.groupId = groupId;
+        this.dbPool = dbPool;
+        this.tableName = tableName;
     }
 
-    public static List<Group> groupParamBuild(List<String> groupIdList) {
-        List<Group> groupList = new ArrayList<>();
-        for (String id:groupIdList)
-            groupList.add(new Group(id));
-        return groupList;
+    public Group() {
     }
+
+    public abstract  List<Group> groupParamBuild() ;
+
     public String getGroupId() {
         return groupId;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public String getDbPool() {
+        return dbPool;
+    }
+
+    public void setDbPool(String dbPool) {
+        this.dbPool = dbPool;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
     public void setGroupId(String groupId) {

@@ -1,15 +1,13 @@
 package com.fs.repayment;
 
+import com.fs.Param.Group;
+import com.fs.Param.RepaymentGroup;
 import com.fs.busi.BusiProcess;
 import com.fs.busi.RepaymentBusi;
-import com.fs.entity.TaskEntity;
 import com.fs.pool.BatchTaskExecutor;
 import com.fs.pool.TaskExecutor;
-import com.fs.Param.Group;
 import com.fs.task.Task;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.fs.util.db.DataBase;
 
 
 public class Test {
@@ -19,15 +17,11 @@ public class Test {
 
     private static void threadTest() throws Exception {
         TaskExecutor executor = new BatchTaskExecutor(10,TaskExecutor.ExecutorService_fixed);
-        TaskEntity entity=new TaskEntity("计划生成");
         BusiProcess process=new RepaymentBusi();
+        Group group = new RepaymentGroup();
 
-        List<String> groups = new ArrayList<>();
-        groups.add("11");
-        groups.add("20");
-        List<Group> param = Group.groupParamBuild(groups);
-
-        Task task = new Task("还款计划",process,param);
+        DataBase.Prepare();
+        Task task = new Task("还款计划",process,group.groupParamBuild());
 ////        executor.execute(task1);
         ((BatchTaskExecutor) executor).batchExecute(task.taskFactroy());
 
