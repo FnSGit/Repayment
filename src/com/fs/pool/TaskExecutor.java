@@ -2,7 +2,10 @@ package com.fs.pool;
 
 import com.fs.task.Task;
 
-import java.util.concurrent.*;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 public class TaskExecutor {
     public static final int ExecutorService_fixed=1;
@@ -34,6 +37,10 @@ public class TaskExecutor {
 
         executorService.execute(data);
 
+    }
+    public void batchExecute(List<Task> taskList) {
+        for (Task task:taskList)
+            executorService.execute(task);
     }
 
     public void shutdown() {

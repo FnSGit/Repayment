@@ -1,8 +1,7 @@
 package com.fs.generate.target.entity;
 
 import com.fs.entity.TaskEntity;
-
-public class YizhiFkxxObj extends TaskEntity {
+public class YizhiFkxxObj  extends TaskEntity {
 	private String orderno;
 	private String fkje;
 	private String lilv;
@@ -21,6 +20,8 @@ public class YizhiFkxxObj extends TaskEntity {
 	private String shifcuoq;
 	private String extrmony;
 	private String plfzuhao;
+	private String jigoudma;
+
 	public void setOrderno(String orderno){
 	   this.orderno = orderno;
 	}
@@ -145,6 +146,13 @@ public class YizhiFkxxObj extends TaskEntity {
 	}
 	public String getPlfzuhao(){
 	   return plfzuhao;
+	}
+
+	public void setJigoudma(String jigoudma){
+	   this.jigoudma = jigoudma;
+	}
+	public String getJigoudma(){
+	   return jigoudma;
 	}
 
 }

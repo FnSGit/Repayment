@@ -1,13 +1,13 @@
 package com.fs.busi.repayment;
 
-import com.fs.group.Group;
 import com.fs.busi.BusiProcess;
 import com.fs.entity.TaskEntity;
 import com.fs.generate.target.entity.YizhiFkxxObj;
+import com.fs.generate.target.entity.YizhiHkjihuaObj;
+import com.fs.group.Group;
 import com.fs.util.db.DataBase;
 import com.fs.util.log.FsLogger;
 import com.fs.util.object.ObjectUtil;
-import com.fs.util.test.YizhiHkjihuaObj;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -20,6 +20,7 @@ public class RepaymentBusi extends BusiProcess {
 
     @Override
     public void process(List<TaskEntity> data) {
+        dbInit("v7yizhi");
         FsLogger logger = FsLogger.getLogger(this.getClass().getName());
         try {
           for (TaskEntity entity:data) {
@@ -64,7 +65,8 @@ public class RepaymentBusi extends BusiProcess {
         int hxfs=Integer.parseInt(fkxx.getHxfs());
         int kouxifs=Integer.parseInt(fkxx.getKouxifs());
 
-        List<YizhiHkjihuaObj> lstHkjihua=getPayPlan(fkxx);
+        GetPayPlan getPayPlan = new GetPayPlan();
+        List<YizhiHkjihuaObj> lstHkjihua=getPayPlan.getPayPlan(fkxx);
 
     }
 }

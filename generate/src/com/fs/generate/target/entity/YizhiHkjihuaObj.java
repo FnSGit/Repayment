@@ -1,3 +1,5 @@
+package com.fs.generate.target.entity;
+
 public class YizhiHkjihuaObj  {
 	private String orderno;
 	private String qici;
@@ -24,6 +26,8 @@ public class YizhiHkjihuaObj  {
 	private String yjwyjnjm;
 	private String yjwyjngq;
 	private String plfzuhao;
+	private String jigoudma;
+	private String zaitubzh;
 	public void setOrderno(String orderno){
 	   this.orderno = orderno;
 	}
@@ -197,6 +201,20 @@ public class YizhiHkjihuaObj  {
 	}
 	public String getPlfzuhao(){
 	   return plfzuhao;
+	}
+
+	public void setJigoudma(String jigoudma){
+	   this.jigoudma = jigoudma;
+	}
+	public String getJigoudma(){
+	   return jigoudma;
+	}
+
+	public void setZaitubzh(String zaitubzh){
+	   this.zaitubzh = zaitubzh;
+	}
+	public String getZaitubzh(){
+	   return zaitubzh;
 	}
 
 }
