@@ -21,7 +21,7 @@ public abstract class  BusiProcess {
                e.printStackTrace();
           }
      }
-     public abstract List<TaskEntity> initGroup(Group param);
+     public abstract List<TaskEntity> getProcessData(Group param);
 
      public abstract void process(List<TaskEntity> taskEntityList);
 

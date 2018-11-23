@@ -32,7 +32,7 @@ public class Task implements Runnable{
         logger.setLogPath("log"+File.separator+ taskName);
 
        start();
-        process.process(process.initGroup(param));
+        process.process(process.getProcessData(param));
        end();
     }
 

@@ -26,7 +26,14 @@ public class RepaymentBusi extends BusiProcess {
           for (TaskEntity entity:data) {
               YizhiFkxxObj fkxxObj= (YizhiFkxxObj) entity;
               logger.debug("开始执行组id:{},数据:{}" ,fkxxObj.getGroupId(),fkxxObj.getOrderno());
-              hkjhProsess(fkxxObj);
+              /*
+              data init
+               */
+
+              /*
+              data process
+               */
+              hkjhProcess(fkxxObj);
               logger.debug("结束执行组id:{},数据:{}" ,fkxxObj.getGroupId(),fkxxObj.getOrderno());
           }
             Thread.sleep(1000);
@@ -39,7 +46,7 @@ public class RepaymentBusi extends BusiProcess {
 
 
     @Override
-    public List<TaskEntity> initGroup(Group param)  {
+    public List<TaskEntity> getProcessData(Group param)  {
         List<TaskEntity> taskEntityList = new ArrayList<>();
         String sql = "select * from yizhi_fkxx where plfzuhao ='"+param.getGroupId()+"'";
         ResultSet resultSet = DataBase.getResultset(param.getDbPool(),sql );
@@ -56,7 +63,7 @@ public class RepaymentBusi extends BusiProcess {
         return taskEntityList;
     }
 
-    private void hkjhProsess(TaskEntity entity) {
+    private void hkjhProcess(TaskEntity entity) {
         YizhiFkxxObj fkxx= (YizhiFkxxObj) entity;
         BigDecimal zerBigDecimal=BigDecimal.ZERO;
 
@@ -65,8 +72,8 @@ public class RepaymentBusi extends BusiProcess {
         int hxfs=Integer.parseInt(fkxx.getHxfs());
         int kouxifs=Integer.parseInt(fkxx.getKouxifs());
 
-        GetPayPlan getPayPlan = new GetPayPlan();
-        List<YizhiHkjihuaObj> lstHkjihua=getPayPlan.getPayPlan(fkxx);
+        initPayParam initPayParam = new initPayParam();
+        List<YizhiHkjihuaObj> lstHkjihua= initPayParam.getPayPlan(fkxx);
 
     }
 }
