@@ -1,14 +1,6 @@
 package com.fs.constants.repayment;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class JihuaParam {
-        public int kouxiFs=0;
-        public int jiesFs=0;
-        public int jixiFs=0;
-        public Map<FeeEnum, Integer> feeFsMap=new HashMap<>();
-        public int specialPro=0;
         /*
          * 末期结束方式
          */
