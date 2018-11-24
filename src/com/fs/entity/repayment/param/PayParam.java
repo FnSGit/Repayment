@@ -21,6 +21,15 @@ public class PayParam {
     protected Map<FeeEnum, Integer> feeFsMap=new HashMap<>();
     protected Map<FeeEnum, Double> feeLvMap=new HashMap<>();
 
+
+
+    public PayParam(YizhiFkxxObj fkxxObj) {
+      initParam(fkxxObj);
+    }
+
+    public PayParam(PayParam payParam) {
+        initParam(payParam);
+    }
     private void initParam(YizhiFkxxObj fkxxObj) {
         this.orderno=fkxxObj.getOrderno();
         this.fkje = Double.parseDouble(fkxxObj.getFkje());
@@ -45,10 +54,26 @@ public class PayParam {
         }
     }
 
-    public PayParam(YizhiFkxxObj fkxxObj) {
-      initParam(fkxxObj);
-    }
+    private void initParam(PayParam payParam) {
+        this.orderno=payParam.getOrderno();
+        this.fkje = payParam.getFkje();
+        this.fkrq = payParam.getFkrq();
+        this.scrq = payParam.getScrq();
+//        this.hkri = "20";//还款日，默认20号。（周期）
+        this.jiesFs = payParam.getJiesFs();
+        this.kouxiFs = payParam.kouxiFs;
+        this.jixiFs = payParam.getJixiFs();
+        this.qixian = payParam.getQixian();
+        this.lilv = payParam.getLilv();
 
+        feeFsMap=payParam.getFeeFsMap();
+        feeLvMap=payParam.getFeeLvMap();
+        try {
+            this.specialPro =payParam.getSpecialPro();
+        } catch (Exception e) {
+            // 防止特殊操作标志为空或字符不符，否则默认为0
+        }
+    }
     public String getOrderno() {
         return orderno;
     }

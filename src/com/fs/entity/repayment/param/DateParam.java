@@ -12,4 +12,8 @@ public class DateParam extends PayParam{
     public DateParam(YizhiFkxxObj fkxxObj) {
         super(fkxxObj);
     }
+
+    public DateParam(PayParam payParam) {
+        super(payParam);
+    }
 }

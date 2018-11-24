@@ -25,7 +25,7 @@ public class ShangkouPlan extends PlanFactory {
     }
 
     @Override
-    public List<YizhiHkjihuaObj> getPlan(YizhiFkxxObj fkxxObj) {
+    public List<YizhiHkjihuaObj> getPlan() {
         List<YizhiHkjihuaObj> hkjihuaObjList = new ArrayList<>();
 
         //取得参数信息
@@ -83,33 +83,33 @@ public class ShangkouPlan extends PlanFactory {
         String year1=RepayTool.theYearToPay(fkrq, 12, jiesFs);//第一年末
         String year2=RepayTool.theYearToPay(fkrq, 24, jiesFs);//第二年末
 
-        DateParam dateParam = new DateParam(fkxxObj);
+        DateParam dateParam = new DateParam(payParam);
         for (int i=0;i<=qiciSize;++i){
             double yhbj=0;//应还本金
             double lixi=0;//每期的利息
             double fee=0;
             double fwfFee = 0.0D;
             double qudfFee = 0.0D;
-            LixiEntity lixiEntity=new LixiEntity(fkxxObj);//默认计息天数30
-            BenjinEntity benjinEntity=new BenjinEntity(fkxxObj);//默认天数30
+            LixiEntity lixiEntity=new LixiEntity(payParam);//默认计息天数30
+            BenjinEntity benjinEntity=new BenjinEntity(payParam);//默认天数30
 //            FeeEntity feeEntity=new FeeEntity(fkje, qixian, feeFs, feeLvMap);
-            BudgetEntity budgetEntity=new BudgetEntity(fkxxObj);
+            BudgetEntity budgetEntity=new BudgetEntity(payParam);
             int jixiDays=0;
             if (i == 0) {//第零期开始计息
                 //生成日期
-                riqiParam=buildRiqi(riqiParam, JihuaParam.qiciShouQi);
-                ksrq = riqiParam.ksrq;//开始日=放款日期
-                jsrq=riqiParam.jsrq;
-                yhrq=riqiParam.yhrq;
+                dateParam=buildRiqi(dateParam, JihuaParam.qiciShouQi);
+                ksrq = dateParam.ksrq;//开始日=放款日期
+                jsrq=dateParam.jsrq;
+                yhrq=dateParam.yhrq;
                 //计息日期
-                jixiDays=jixiShouqiDays(riqiParam);
+                jixiDays=jixiShouqiDays(dateParam);
 
                 //利息，本金，费用
                 lixiEntity.days = (long)jixiDays;
                 lixi = this.calLixi(lixiEntity,JihuaParam.qiciShouQi);
                 benjinEntity.days = (long)jixiDays;
                 benjinEntity.lixi = lixi;
-                yhbj = this.calBenjin(benjinEntity,riqiParam);
+                yhbj = this.calBenjin(benjinEntity,dateParam);
                 //计算费用
 
                 int fwfFs=(Integer)feeFs.get(FeeEnum.fwfFee);
@@ -122,18 +122,18 @@ public class ShangkouPlan extends PlanFactory {
 
             }else if (i==qiciSize-1) {//倒数第二期，一般用于末期俩还款日拆分
                 if (kouxiFs==JihuaParam.kouxiFs2&&jixiFs!=JihuaParam.jixiFs21) {
-                    riqiParam=buildRiqi(riqiParam, JihuaParam.qiciMoQi);
-                    ksrq=riqiParam.ksrq;//开始日期等于上次结束日期
-                    jsrq=riqiParam.jsrq;
+                    dateParam=buildRiqi(dateParam, JihuaParam.qiciMoQi);
+                    ksrq=dateParam.ksrq;//开始日期等于上次结束日期
+                    jsrq=dateParam.jsrq;
                     yhrq=ksrq;
 
                     if(ksri.equals(hkri)) {
                         jixiDays=30;
                     }else{
                         if (kouxiFs==JihuaParam.kouxiFs2&&(ksri.compareTo("15")>=0&&ksri.compareTo("19")<=0)) {
-                            jixiDays=60-jixiShouqiDays(riqiParam);//利息按首尾差处理,首期超30天
+                            jixiDays=60-jixiShouqiDays(dateParam);//利息按首尾差处理,首期超30天
                         }else {
-                            jixiDays=30-jixiShouqiDays(riqiParam);//利息按首尾差处理
+                            jixiDays=30-jixiShouqiDays(dateParam);//利息按首尾差处理
                         }
 
                     }
@@ -157,14 +157,14 @@ public class ShangkouPlan extends PlanFactory {
                     }
                     fee = fwfFee + qudfFee;
                 }else{
-                    riqiParam=buildRiqi(riqiParam, JihuaParam.qiciZhongQi);
-                    ksrq=riqiParam.ksrq;//开始日期等于上次结束日期
-                    jsrq = riqiParam.jsrq;//结束日期为下月当日
-                    yhrq=riqiParam.yhrq;
+                    dateParam=buildRiqi(dateParam, JihuaParam.qiciZhongQi);
+                    ksrq=dateParam.ksrq;//开始日期等于上次结束日期
+                    jsrq = dateParam.jsrq;//结束日期为下月当日
+                    yhrq=dateParam.yhrq;
 
                     lixi = calLixi(lixiEntity,JihuaParam.qiciZhongQi);//利息每月按30天计算
                     benjinEntity.lixi=lixi;
-                    yhbj=calBenjin(benjinEntity,riqiParam);
+                    yhbj=calBenjin(benjinEntity,dateParam);
                     //计算费用
                     int fwfFs= (Integer)feeFs.get(FeeEnum.fwfFee);
                     int qdfFs= (Integer)feeFs.get(FeeEnum.qdfFee);
@@ -178,21 +178,21 @@ public class ShangkouPlan extends PlanFactory {
             } else if (i==qiciSize){//最后一期
 
                 if(kouxiFs==JihuaParam.kouxiFs2&&jixiFs!=JihuaParam.jixiFs21){
-                    riqiParam=buildRiqi(riqiParam, JihuaParam.qicijiBen);
+                    dateParam=buildRiqi(dateParam, JihuaParam.qicijiBen);
 
-                    ksrq=riqiParam.ksrq;
-                    jsrq=riqiParam.jsrq;
-                    yhrq=riqiParam.yhrq;;
+                    ksrq=dateParam.ksrq;
+                    jsrq=dateParam.jsrq;
+                    yhrq=dateParam.yhrq;;
 
                     benjinEntity.isLast=true;
-                    yhbj=calBenjin(benjinEntity,riqiParam);
+                    yhbj=calBenjin(benjinEntity,dateParam);
 
                 }else{
-                    riqiParam=buildRiqi(riqiParam, JihuaParam.qiciMoQi);
+                    dateParam=buildRiqi(dateParam, JihuaParam.qiciMoQi);
 
-                    ksrq=riqiParam.ksrq;//开始日期等于上次结束日期
-                    jsrq=riqiParam.jsrq;
-                    yhrq=riqiParam.yhrq;;
+                    ksrq=dateParam.ksrq;//开始日期等于上次结束日期
+                    jsrq=dateParam.jsrq;
+                    yhrq=dateParam.yhrq;;
 
                     if(ksri.equals(hkri)) {
                         jixiDays=30;
@@ -201,9 +201,9 @@ public class ShangkouPlan extends PlanFactory {
                             jixiDays=30;
                         }else{
                             if (kouxiFs==JihuaParam.kouxiFs2&&(ksri.compareTo("15")>=0&&ksri.compareTo("19")<=0)) {
-                                jixiDays=60-jixiShouqiDays(riqiParam);//利息按首尾差处理,首期超30天
+                                jixiDays=60-jixiShouqiDays(dateParam);//利息按首尾差处理,首期超30天
                             }else {
-                                jixiDays=30-jixiShouqiDays(riqiParam);//利息按首尾差处理
+                                jixiDays=30-jixiShouqiDays(dateParam);//利息按首尾差处理
                             }
 
                         }
@@ -213,7 +213,7 @@ public class ShangkouPlan extends PlanFactory {
                     lixi = calLixi(lixiEntity,JihuaParam.qiciMoQi);
                     benjinEntity.lixi=lixi;
                     benjinEntity.isLast=true;
-                    yhbj=calBenjin(benjinEntity,riqiParam);
+                    yhbj=calBenjin(benjinEntity,dateParam);
                     //计算费用
                     int fwfFs= (Integer)feeFs.get(FeeEnum.fwfFee);
                     int qdfFs= (Integer)feeFs.get(FeeEnum.qdfFee);
@@ -226,49 +226,49 @@ public class ShangkouPlan extends PlanFactory {
             }else {//中间期
                 //月息年本中间期本金收取
                 if(kouxiFs==JihuaParam.kouxiFs2&&yxnbJixi==JihuaParam.jixiFs4){
-                    if(riqiParam.jsrq.compareTo(year1)>=0&&riqiParam.ksrq.compareTo(year1)<0){
-                        String yearKsrq=riqiParam.ksrq;
-                        String yearJsrq=riqiParam.jsrq;
-                        riqiParam.jsrq=year1;
-                        riqiParam=buildRiqi(riqiParam, JihuaParam.qicijiBen);
-                        budgetEntity=budget(budgetEntity,JihuaParam.qicijiBen, riqiParam, lixiEntity, benjinEntity, feeEntity, 0);
-                        hkjihuaObjList=genQici( hkjihuaObjList,riqiParam, budgetEntity, orderNo, i);
+                    if(dateParam.jsrq.compareTo(year1)>=0&&dateParam.ksrq.compareTo(year1)<0){
+                        String yearKsrq=dateParam.ksrq;
+                        String yearJsrq=dateParam.jsrq;
+                        dateParam.jsrq=year1;
+                        dateParam=buildRiqi(dateParam, JihuaParam.qicijiBen);
+                        budgetEntity=budget(budgetEntity,JihuaParam.qicijiBen, dateParam, lixiEntity, benjinEntity, feeEntity, 0);
+                        hkjihuaObjList=genQici( hkjihuaObjList,dateParam, budgetEntity, orderNo, i);
                         ++i;
 
                         //中间期
-                        riqiParam.ksrq=yearKsrq;
-                        riqiParam.jsrq=yearJsrq;
-                        riqiParam=buildRiqi(riqiParam, JihuaParam.qiciZhongQi);
-                        budgetEntity=budget(budgetEntity,JihuaParam.qiciZhongQi, riqiParam, lixiEntity, benjinEntity, feeEntity, lixiMonth);
-                        hkjihuaObjList=genQici( hkjihuaObjList,riqiParam, budgetEntity, orderNo, i);
+                        dateParam.ksrq=yearKsrq;
+                        dateParam.jsrq=yearJsrq;
+                        dateParam=buildRiqi(dateParam, JihuaParam.qiciZhongQi);
+                        budgetEntity=budget(budgetEntity,JihuaParam.qiciZhongQi, dateParam, lixiEntity, benjinEntity, feeEntity, lixiMonth);
+                        hkjihuaObjList=genQici( hkjihuaObjList,dateParam, budgetEntity, orderNo, i);
                         continue;
-                    }else if (riqiParam.jsrq.compareTo(year2)>=0&&riqiParam.ksrq.compareTo(year2)<0) {
-                        String yearKsrq=riqiParam.ksrq;
-                        String yearJsrq=riqiParam.jsrq;
-                        riqiParam.jsrq=year2;
-                        riqiParam=buildRiqi(riqiParam, JihuaParam.qicijiBen);
-                        budgetEntity=budget(budgetEntity,JihuaParam.qicijiBen, riqiParam, lixiEntity, benjinEntity, feeEntity, 0);
-                        hkjihuaObjList=genQici( hkjihuaObjList,riqiParam, budgetEntity, orderNo, i);
+                    }else if (dateParam.jsrq.compareTo(year2)>=0&&dateParam.ksrq.compareTo(year2)<0) {
+                        String yearKsrq=dateParam.ksrq;
+                        String yearJsrq=dateParam.jsrq;
+                        dateParam.jsrq=year2;
+                        dateParam=buildRiqi(dateParam, JihuaParam.qicijiBen);
+                        budgetEntity=budget(budgetEntity,JihuaParam.qicijiBen, dateParam, lixiEntity, benjinEntity, feeEntity, 0);
+                        hkjihuaObjList=genQici( hkjihuaObjList,dateParam, budgetEntity, orderNo, i);
                         ++i;
 
                         //中间期
-                        riqiParam.ksrq=yearKsrq;
-                        riqiParam.jsrq=yearJsrq;
-                        riqiParam=buildRiqi(riqiParam, JihuaParam.qiciZhongQi);
-                        budgetEntity=budget(budgetEntity,JihuaParam.qiciZhongQi, riqiParam, lixiEntity, benjinEntity, feeEntity, lixiMonth);
-                        hkjihuaObjList=genQici( hkjihuaObjList,riqiParam, budgetEntity, orderNo, i);
+                        dateParam.ksrq=yearKsrq;
+                        dateParam.jsrq=yearJsrq;
+                        dateParam=buildRiqi(dateParam, JihuaParam.qiciZhongQi);
+                        budgetEntity=budget(budgetEntity,JihuaParam.qiciZhongQi, dateParam, lixiEntity, benjinEntity, feeEntity, lixiMonth);
+                        hkjihuaObjList=genQici( hkjihuaObjList,dateParam, budgetEntity, orderNo, i);
                         continue;
                     }
                 }
 
-                riqiParam=buildRiqi(riqiParam, JihuaParam.qiciZhongQi);
-                ksrq=riqiParam.ksrq;//开始日期等于上次结束日期
-                jsrq = riqiParam.jsrq;//结束日期为下月当日
-                yhrq=riqiParam.yhrq;
+                dateParam=buildRiqi(dateParam, JihuaParam.qiciZhongQi);
+                ksrq=dateParam.ksrq;//开始日期等于上次结束日期
+                jsrq = dateParam.jsrq;//结束日期为下月当日
+                yhrq=dateParam.yhrq;
 
                 lixi = calLixi(lixiEntity,JihuaParam.qiciZhongQi);//利息每月按30天计算
                 benjinEntity.lixi=lixi;
-                yhbj=calBenjin(benjinEntity,riqiParam);
+                yhbj=calBenjin(benjinEntity,dateParam);
                 //计算费用
                 int fwfFs= (Integer)feeFs.get(FeeEnum.fwfFee);
                 int qdfFs= (Integer)feeFs.get(FeeEnum.qdfFee);

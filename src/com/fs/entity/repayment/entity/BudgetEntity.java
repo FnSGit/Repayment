@@ -14,4 +14,8 @@ public class BudgetEntity extends PayParam {
     public BudgetEntity(YizhiFkxxObj fkxxObj) {
         super(fkxxObj);
     }
+
+    public BudgetEntity(PayParam payParam) {
+        super(payParam);
+    }
 }
