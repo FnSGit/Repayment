@@ -8,8 +8,8 @@ package com.fs.busi.repayment;
 
 import com.fs.busi.BusiProcess;
 import com.fs.constants.BusiEnum;
-import com.fs.constants.repayment.FeeEnum;
 import com.fs.constants.repayment.JihuaParam;
+import com.fs.entity.repayment.param.PayParam;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
 import com.fs.util.common.CommUtil;
@@ -19,7 +19,6 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.fs.util.date.DateUtil.getNextMonth;
 
@@ -46,35 +45,23 @@ public class initPayParam {
 			lstHkjh=getHkRiqi2(fkxx, lstHkjh, param);*/
 
 		//506 568订单
-		JihuaParam param=new JihuaParam();
-		Map<FeeEnum, Integer> feeFSMap=param.feeFsMap;
+		PayParam payParam = new PayParam(fkxx);
 
-		feeFSMap.put(FeeEnum.fwfFee, Integer.parseInt(fkxx.getFysqfs()));
-		feeFSMap.put(FeeEnum.qdfFee, Integer.parseInt(fkxx.getQdffsqfs()));
 
-		param.jiesFs=Integer.parseInt(fkxx.getJiesfs());
-		param.jixiFs=Integer.parseInt(fkxx.getHxfs());
-		param.kouxiFs=Integer.parseInt(fkxx.getKouxifs());
-		try {
-			param.specialPro=Integer.parseInt(fkxx.getSpeclpro());
-		} catch (Exception e) {
-			// 防止特殊操作标志为空或字符不符，否则默认为0
-		}
-
-		switch (param.specialPro) {
+		switch (payParam.getSpecialPro()) {
 			case JihuaParam.specialPro1:case JihuaParam.specialPro2:
-				if (param.kouxiFs==JihuaParam.kouxiFs2) {
-					lstHkjh=getHkRiqi4(fkxx, param);
-				}else if(param.kouxiFs==JihuaParam.kouxiFs1){
-					lstHkjh=getHkRiqi5(fkxx, param);
+				if (payParam.getKouxiFs()==JihuaParam.kouxiFs2) {
+//					lstHkjh=getHkRiqi4(fkxx, param);
+				}else if(payParam.getKouxiFs()==JihuaParam.kouxiFs1){
+//					lstHkjh=getHkRiqi5(fkxx, param);
 				}
 				break;
 
 			default:
-				if (param.kouxiFs==JihuaParam.kouxiFs2) {
-					lstHkjh=getHkRiqi1(fkxx, lstHkjh, param);
-				}else if(param.kouxiFs==JihuaParam.kouxiFs1){
-					lstHkjh=getHkRiqi2(fkxx, lstHkjh, param);
+				if (payParam.getKouxiFs()==JihuaParam.kouxiFs2) {
+					lstHkjh=new ShangkouPlan(payParam).getPlan(fkxx);
+				}else if(payParam.getKouxiFs()==JihuaParam.kouxiFs1){
+//					lstHkjh=getHkRiqi2(fkxx, lstHkjh, param);
 				}
 				break;
 		}

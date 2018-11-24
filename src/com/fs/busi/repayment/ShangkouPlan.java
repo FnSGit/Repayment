@@ -2,6 +2,12 @@ package com.fs.busi.repayment;
 
 import com.fs.constants.repayment.FeeEnum;
 import com.fs.constants.repayment.JihuaParam;
+import com.fs.entity.repayment.entity.BenjinEntity;
+import com.fs.entity.repayment.entity.BudgetEntity;
+import com.fs.entity.repayment.entity.FeeEntity;
+import com.fs.entity.repayment.entity.LixiEntity;
+import com.fs.entity.repayment.param.DateParam;
+import com.fs.entity.repayment.param.PayParam;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
 
@@ -13,33 +19,33 @@ import java.util.List;
 import java.util.Map;
 
 public class ShangkouPlan extends PlanFactory {
-    public ShangkouPlan(JihuaParam jihuaParam, YizhiFkxxObj fkxxObj) {
-        super(jihuaParam, fkxxObj);
+
+    public ShangkouPlan(PayParam payParam) {
+        super(payParam);
     }
 
     @Override
-    public List<YizhiHkjihuaObj> getPlan() {
+    public List<YizhiHkjihuaObj> getPlan(YizhiFkxxObj fkxxObj) {
         List<YizhiHkjihuaObj> hkjihuaObjList = new ArrayList<>();
 
         //取得参数信息
-        int kouxiFs=param.kouxiFs;
-        int jixiFs=param.jixiFs;
-        int jiesFs=param.jiesFs;
-        Map<FeeEnum, Integer> feeFs = param.feeFsMap;
-        Map<FeeEnum, Double> feeLvMap = new HashMap<>();
-        int special=param.specialPro;
+        int kouxiFs=payParam.getKouxiFs();
+        int jixiFs=payParam.getJixiFs();
+        int jiesFs=payParam.getJiesFs();
+        Map<FeeEnum, Integer> feeFs = payParam.getFeeFsMap();
+        Map<FeeEnum, Double> feeLvMap =payParam.getFeeLvMap();
+        int special=payParam.getSpecialPro();
         //取得还款信息
-        double fkje=fkxx.getFkje().doubleValue();//放款金额
-        String fkrq=fkxx.getFkrq();//放款日期
-        String orderNo=fkxx.getOrderno();
+        double fkje=payParam.getFkje();//放款金额
+        String fkrq=payParam.getFkrq();//放款日期
+        String orderNo=payParam.getOrderno();
 
-        double lilv=fkxx.getLilv().doubleValue();//利率
-//	        double fee=fkxx.getFwfje().doubleValue();//服务费用
-        double fwflv = fkxx.getFwflv().doubleValue();
-        feeLvMap.put(FeeEnum.fwfFee, fwflv);
-        double qudfflv = fkxx.getQudfflv().doubleValue();
-        feeLvMap.put(FeeEnum.qdfFee, qudfflv);
-        int qixian=Integer.parseInt(fkxx.getQixian());//还款总期限（单位：月）
+        double lilv=payParam.getLilv();//利率
+//        double fwflv =payParam.getFeeLvMap().get(FeeEnum.fwfFee);
+//        feeLvMap.put(FeeEnum.fwfFee, fwflv);
+//        double qudfflv = fkxx.getQudfflv().doubleValue();
+//        feeLvMap.put(FeeEnum.qdfFee, qudfflv);
+        int qixian=payParam.getQixian();//还款总期限（单位：月）
 
         String ksrq="";/*开始日期*/
         String jsrq = "";//结束日期
@@ -74,22 +80,20 @@ public class ShangkouPlan extends PlanFactory {
         }
 
         //月息年本中间期还本日期处理
-        String year1=theYearToPay(fkrq, 12, jiesFs);//第一年末
-        String year2=theYearToPay(fkrq, 24, jiesFs);//第二年末
+        String year1=RepayTool.theYearToPay(fkrq, 12, jiesFs);//第一年末
+        String year2=RepayTool.theYearToPay(fkrq, 24, jiesFs);//第二年末
 
-
-
-        RiqiParam riqiParam=new RiqiParam(fkrq, fkxx.getSchkr(), hkri, jiesFs, kouxiFs, jixiFs, qixian);
+        DateParam dateParam = new DateParam(fkxxObj);
         for (int i=0;i<=qiciSize;++i){
             double yhbj=0;//应还本金
             double lixi=0;//每期的利息
             double fee=0;
             double fwfFee = 0.0D;
             double qudfFee = 0.0D;
-            LixiEntity lixiEntity=new LixiEntity(fkje, lilv, lixiMonth, jixiFs, qixian,i,kouxiFs);//默认计息天数30
-            BenjinEntity benjinEntity=new BenjinEntity(fkje, lilv, lixiMonth, jixiFs, qixian);//默认天数30
-            FeeEntity feeEntity=new FeeEntity(fkje, qixian, feeFs, feeLvMap);
-            BudgetEntity budgetEntity=new BudgetEntity();
+            LixiEntity lixiEntity=new LixiEntity(fkxxObj);//默认计息天数30
+            BenjinEntity benjinEntity=new BenjinEntity(fkxxObj);//默认天数30
+//            FeeEntity feeEntity=new FeeEntity(fkje, qixian, feeFs, feeLvMap);
+            BudgetEntity budgetEntity=new BudgetEntity(fkxxObj);
             int jixiDays=0;
             if (i == 0) {//第零期开始计息
                 //生成日期
