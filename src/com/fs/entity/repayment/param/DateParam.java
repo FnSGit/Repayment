@@ -13,7 +13,4 @@ public class DateParam extends PayParam{
         super(fkxxObj);
     }
 
-    public DateParam(PayParam payParam) {
-        super(payParam);
-    }
 }

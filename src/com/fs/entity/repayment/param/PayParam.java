@@ -1,10 +1,6 @@
 package com.fs.entity.repayment.param;
 
-import com.fs.constants.repayment.FeeEnum;
 import com.fs.generate.target.entity.YizhiFkxxObj;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class PayParam {
     protected String orderno;
@@ -18,8 +14,8 @@ public class PayParam {
     protected int qixian;
     protected double lilv;
     protected int specialPro=0;
-    protected Map<FeeEnum, Integer> feeFsMap=new HashMap<>();
-    protected Map<FeeEnum, Double> feeLvMap=new HashMap<>();
+    protected String extraDate;
+    protected double extraMoney;
 
 
 
@@ -27,9 +23,6 @@ public class PayParam {
       initParam(fkxxObj);
     }
 
-    public PayParam(PayParam payParam) {
-        initParam(payParam);
-    }
     private void initParam(YizhiFkxxObj fkxxObj) {
         this.orderno=fkxxObj.getOrderno();
         this.fkje = Double.parseDouble(fkxxObj.getFkje());
@@ -41,11 +34,8 @@ public class PayParam {
         this.jixiFs = Integer.parseInt(fkxxObj.getHxfs());
         this.qixian = Integer.parseInt(fkxxObj.getQixian());
         this.lilv = Double.parseDouble(fkxxObj.getLilv());
-
-        feeFsMap.put(FeeEnum.fwfFee, Integer.parseInt(fkxxObj.getFysqfs()));
-        feeFsMap.put(FeeEnum.qdfFee, Integer.parseInt(fkxxObj.getQdffsqfs()));
-        feeLvMap.put(FeeEnum.fwfFee, Double.parseDouble(fkxxObj.getFwflv()));
-        feeLvMap.put(FeeEnum.qdfFee, Double.parseDouble(fkxxObj.getQudfflv()));
+        this.extraDate=fkxxObj.getExtrdate();
+        this.extraMoney = Double.parseDouble(fkxxObj.getExtrmony());
 
         try {
             this.specialPro = Integer.parseInt(fkxxObj.getSpeclpro());
@@ -54,26 +44,22 @@ public class PayParam {
         }
     }
 
-    private void initParam(PayParam payParam) {
-        this.orderno=payParam.getOrderno();
-        this.fkje = payParam.getFkje();
-        this.fkrq = payParam.getFkrq();
-        this.scrq = payParam.getScrq();
-//        this.hkri = "20";//还款日，默认20号。（周期）
-        this.jiesFs = payParam.getJiesFs();
-        this.kouxiFs = payParam.kouxiFs;
-        this.jixiFs = payParam.getJixiFs();
-        this.qixian = payParam.getQixian();
-        this.lilv = payParam.getLilv();
-
-        feeFsMap=payParam.getFeeFsMap();
-        feeLvMap=payParam.getFeeLvMap();
-        try {
-            this.specialPro =payParam.getSpecialPro();
-        } catch (Exception e) {
-            // 防止特殊操作标志为空或字符不符，否则默认为0
-        }
+    public String getExtraDate() {
+        return extraDate;
     }
+
+    public void setExtraDate(String extraDate) {
+        this.extraDate = extraDate;
+    }
+
+    public double getExtraMoney() {
+        return extraMoney;
+    }
+
+    public void setExtraMoney(double extraMoney) {
+        this.extraMoney = extraMoney;
+    }
+
     public String getOrderno() {
         return orderno;
     }
@@ -118,11 +104,49 @@ public class PayParam {
         return specialPro;
     }
 
-    public Map<FeeEnum, Integer> getFeeFsMap() {
-        return feeFsMap;
+
+    public void setOrderno(String orderno) {
+        this.orderno = orderno;
     }
 
-    public Map<FeeEnum, Double> getFeeLvMap() {
-        return feeLvMap;
+    public void setFkje(double fkje) {
+        this.fkje = fkje;
     }
+
+    public void setFkrq(String fkrq) {
+        this.fkrq = fkrq;
+    }
+
+    public void setScrq(String scrq) {
+        this.scrq = scrq;
+    }
+
+    public void setHkri(String hkri) {
+        this.hkri = hkri;
+    }
+
+    public void setJiesFs(int jiesFs) {
+        this.jiesFs = jiesFs;
+    }
+
+    public void setKouxiFs(int kouxiFs) {
+        this.kouxiFs = kouxiFs;
+    }
+
+    public void setJixiFs(int jixiFs) {
+        this.jixiFs = jixiFs;
+    }
+
+    public void setQixian(int qixian) {
+        this.qixian = qixian;
+    }
+
+    public void setLilv(double lilv) {
+        this.lilv = lilv;
+    }
+
+    public void setSpecialPro(int specialPro) {
+        this.specialPro = specialPro;
+    }
+
 }

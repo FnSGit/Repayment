@@ -15,7 +15,52 @@ public class BudgetEntity extends PayParam {
         super(fkxxObj);
     }
 
-    public BudgetEntity(PayParam payParam) {
-        super(payParam);
+
+    public double getLixi() {
+        return lixi;
+    }
+
+    public void setLixi(double lixi) {
+        this.lixi = lixi;
+    }
+
+    public double getBenj() {
+        return benj;
+    }
+
+    public void setBenj(double benj) {
+        this.benj = benj;
+    }
+
+    public double getFee() {
+        return fee;
+    }
+
+    public void setFee(double fee) {
+        this.fee = fee;
+    }
+
+    public double getFwfee() {
+        return fwfee;
+    }
+
+    public void setFwfee(double fwfee) {
+        this.fwfee = fwfee;
+    }
+
+    public double getQdffee() {
+        return qdffee;
+    }
+
+    public void setQdffee(double qdffee) {
+        this.qdffee = qdffee;
+    }
+
+    public long getDays() {
+        return days;
+    }
+
+    public void setDays(long days) {
+        this.days = days;
     }
 }

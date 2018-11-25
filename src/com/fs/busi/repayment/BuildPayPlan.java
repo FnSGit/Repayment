@@ -9,10 +9,12 @@ package com.fs.busi.repayment;
 import com.fs.busi.BusiProcess;
 import com.fs.constants.BusiEnum;
 import com.fs.constants.repayment.JihuaParam;
+import com.fs.entity.repayment.entity.PayPlanStatic;
 import com.fs.entity.repayment.param.PayParam;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
 import com.fs.util.common.CommUtil;
+import com.fs.util.date.DateUtil;
 import com.fs.util.db.DataBase;
 
 import java.math.BigInteger;
@@ -20,13 +22,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.fs.util.date.DateUtil.getNextMonth;
 
-public class initPayParam {
+public class BuildPayPlan {
 
-	private int firstDays;
-	private String payedWyjRiqi;
-    private YizhiHkjihuaObj lastHkjh;
+    private  YizhiHkjihuaObj lastHkjh;
+
+
 	/**
 	 * 根据还款方式获得不同还款计划
 	 * @param fkxx 放款信息
@@ -37,8 +38,8 @@ public class initPayParam {
 		 * 计划信息初始化
 		 */
 		List<YizhiHkjihuaObj> lstHkjh=new ArrayList<>();
-		firstDays=1;//首期天数
-		payedWyjRiqi="";
+		PayPlanStatic.firstDays=1;//首期天数
+		PayPlanStatic.payedWyjRiqi="";
 
 			/*//669订单
 			JihuaParam param=get669Plan(fkxx.getHxfs());
@@ -93,8 +94,8 @@ public class initPayParam {
 						continue;
 					} else if (hkjihua.getQici().equals("1")) {
 						hkjihua.setKsriqi(lastHkjh.getKsriqi());
-						hkjihua.setYhkriqi(getNextMonth(lastHkjh.getKsriqi(), 1));
-						hkjihua.setJsriqi(getNextMonth(lastHkjh.getKsriqi(), 1));
+						hkjihua.setYhkriqi(DateUtil.getNextMonth(lastHkjh.getKsriqi(), 1));
+						hkjihua.setJsriqi(DateUtil.getNextMonth(lastHkjh.getKsriqi(), 1));
 						hkjihua.setYinghklx(CommUtil.Operator.add.add(lastHkjh.getYinghklx(), hkjihua.getYinghklx()).toString());
 						hkjihua.setYinghkbj(CommUtil.Operator.add.add(lastHkjh.getYinghkbj(), hkjihua.getYinghkbj()).toString());
 						hkjihua.setYhfwfee(CommUtil.Operator.add.add(lastHkjh.getYhfwfee(), hkjihua.getYhfwfee()).toString());

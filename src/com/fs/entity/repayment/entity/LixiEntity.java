@@ -1,6 +1,5 @@
 package com.fs.entity.repayment.entity;
 
-import com.fs.entity.repayment.param.PayParam;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 
 public class LixiEntity extends BudgetEntity{
@@ -12,7 +11,4 @@ public class LixiEntity extends BudgetEntity{
         super(fkxxObj);
     }
 
-    public LixiEntity(PayParam payParam) {
-        super(payParam);
-    }
 }

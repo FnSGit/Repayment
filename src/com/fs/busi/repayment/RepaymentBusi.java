@@ -72,8 +72,8 @@ public class RepaymentBusi extends BusiProcess {
         int hxfs=Integer.parseInt(fkxx.getHxfs());
         int kouxifs=Integer.parseInt(fkxx.getKouxifs());
 
-        initPayParam initPayParam = new initPayParam();
-        List<YizhiHkjihuaObj> lstHkjihua= initPayParam.getPayPlan(fkxx);
+        BuildPayPlan BuildPayPlan = new BuildPayPlan();
+        List<YizhiHkjihuaObj> lstHkjihua= BuildPayPlan.getPayPlan(fkxx);
 
     }
 }
