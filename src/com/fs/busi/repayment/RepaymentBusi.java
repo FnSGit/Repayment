@@ -70,14 +70,10 @@ public class RepaymentBusi extends BusiProcess {
         YizhiFkxxObj fkxx= (YizhiFkxxObj) entity;
         BigDecimal zerBigDecimal=BigDecimal.ZERO;
 
-        String sOrderNo=fkxx.getOrderno();//订单号
-        double dfkje=Double.parseDouble(fkxx.getFkje());
-        int hxfs=Integer.parseInt(fkxx.getHxfs());
-        int kouxifs=Integer.parseInt(fkxx.getKouxifs());
-
         PayPlan plan = new PayPlan(statement);
         List<YizhiHkjihuaObj> lstHkjihua= plan.getPayPlan(fkxx);
         plan.insertPlan(lstHkjihua,fkxx);
+
 
     }
 }

@@ -148,7 +148,6 @@ public class PayPlan{
         Map<String, YizhiHkjihuaObj> mapWHkjihua=new HashMap<>();//为还清期次
         Map<String, YizhiHkjihuaObj> mapGQHkjihua=new HashMap<>();//违约金挂起期次
         //先入表，解耦和
-        if(CommUtil.isNull(lstHkjihua)) continue;
 
 
         String sHkriqi="";//还款流水日期记录
