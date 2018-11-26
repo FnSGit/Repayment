@@ -1,3 +1,5 @@
+package com.fs;
+
 import com.fs.busi.BusiProcess;
 import com.fs.busi.repayment.RepaymentBusi;
 import com.fs.constants.ConstantComm;
