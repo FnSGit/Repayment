@@ -10,10 +10,18 @@ import java.util.List;
 
 public abstract class  BusiProcess {
 
-     public static String dbpool;
-     public static Statement statement;
 
-     protected static void dbInit(String db) {
+
+     protected  String dbpool;
+     protected  Statement statement;
+
+     public BusiProcess() {
+     }
+     public BusiProcess(String dbpool) {
+          dbInit(dbpool);
+     }
+     protected  void dbInit(String db) {
+          DataBase.setFalseCommit(db);
           dbpool=db;
           try {
                statement=DataBase.getConn(db).createStatement();

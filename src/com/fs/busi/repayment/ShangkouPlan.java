@@ -10,7 +10,6 @@ import com.fs.entity.repayment.param.DateParam;
 import com.fs.entity.repayment.param.PayParam;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
-import com.fs.util.common.CommUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -301,11 +300,11 @@ public class ShangkouPlan extends PlanFactory {
             if (i>0) {
                 hkjihuaLastSecond=hkjihuaObjList.get(i-1);
                 if(hkjihua.getYhkriqi().equals(hkjihuaLastSecond.getYhkriqi())){
-                    hkjihuaLastSecond.setYinghkbj(CommUtil.Operator.add.add(hkjihua.getYinghkbj(),hkjihuaLastSecond.getYinghkbj()).toString());
-                    hkjihuaLastSecond.setYinghklx(CommUtil.Operator.add.add(hkjihua.getYinghklx(),hkjihuaLastSecond.getYinghklx()).toString());
-                    hkjihuaLastSecond.setYhfee(CommUtil.Operator.add.add(hkjihua.getYhfee(),hkjihuaLastSecond.getYhfee()).toString());
-                    hkjihuaLastSecond.setYhfwfee(CommUtil.Operator.add.add(hkjihua.getYhfwfee(),hkjihuaLastSecond.getYhfwfee()).toString());
-                    hkjihuaLastSecond.setYhqdffee(CommUtil.Operator.add.add(hkjihua.getYhqdffee(),hkjihuaLastSecond.getYhqdffee()).toString());
+                    hkjihuaLastSecond.setYinghkbj(new BigDecimal(hkjihua.getYinghkbj()).add(new BigDecimal(hkjihuaLastSecond.getYinghkbj())).toString());
+                    hkjihuaLastSecond.setYinghklx(new BigDecimal(hkjihua.getYinghklx()).add(new BigDecimal(hkjihuaLastSecond.getYinghklx())).toString());
+                    hkjihuaLastSecond.setYhfee(new BigDecimal(hkjihua.getYhfee()).add(new BigDecimal(hkjihuaLastSecond.getYhfee())).toString());
+                    hkjihuaLastSecond.setYhfwfee(new BigDecimal(hkjihua.getYhfwfee()).add(new BigDecimal(hkjihuaLastSecond.getYhfwfee())).toString());
+                    hkjihuaLastSecond.setYhqdffee(new BigDecimal(hkjihua.getYhqdffee()).add(new BigDecimal(hkjihuaLastSecond.getYhqdffee())).toString());
 
                     hkjihuaObjList.remove(i-1);
                     hkjihuaObjList.add(hkjihuaLastSecond);

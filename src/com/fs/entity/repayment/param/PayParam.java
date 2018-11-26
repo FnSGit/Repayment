@@ -34,11 +34,11 @@ public class PayParam {
         this.jixiFs = Integer.parseInt(fkxxObj.getHxfs());
         this.qixian = Integer.parseInt(fkxxObj.getQixian());
         this.lilv = Double.parseDouble(fkxxObj.getLilv());
-        this.extraDate=fkxxObj.getExtrdate();
-        this.extraMoney = Double.parseDouble(fkxxObj.getExtrmony());
 
         try {
             this.specialPro = Integer.parseInt(fkxxObj.getSpeclpro());
+            this.extraMoney = Double.parseDouble(fkxxObj.getExtrmony());
+            this.extraDate=fkxxObj.getExtrdate();
         } catch (Exception e) {
             // 防止特殊操作标志为空或字符不符，否则默认为0
         }

@@ -18,14 +18,22 @@
 		<!--预演fbps-->
 				<!--<DatabasePool name="fbps" sid="exps" type="oracle" host="20.200.22.38"-->
 					  <!--port="1521" username="exps" password="exps2017" size="-5" />-->
-		<!--本地 mysql-->
-		<!--<DatabasePool name="localYizhi"  type="mysql"-->
-					  <!--url="jdbc:mysql://192.168.159.135:3306/v7yizhi?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;serverTimezone=UTC"-->
-					  <!--username="v7yizhi" password="V7yizhi."  size="-10" />-->
+		<!--<DatabasePool name="fbps" sid="ccgl" type="oracle" host="192.168.159.199"-->
+					  <!--port="1521" username="c##nudev" password="nudev" size="-5" />-->
+		<!--<DatabasePool name="rbdp"  type="mysql"-->
+					  <!--url="jdbc:mysql://20.5.176.71:3306/rbdp?useUnicode=true&amp;characterEncoding=UTF-8"-->
+					  <!--username="rbdp" password="rbdp2018" size="-10" />-->
+		<!--<DatabasePool name="fbps"  type="mysql"-->
+					  <!--url="jdbc:mysql://20.5.176.71:3306/fbps?useUnicode=true&amp;characterEncoding=UTF-8"-->
+					  <!--username="fbps" password="fbps2018" size="-10" />-->
 		<!--中佳信ltts移植环境-->
 		<!--<DatabasePool name="yizhi" sid="cldb" type="oracle" host="10.33.80.133"-->
 					  <!--port="1521" username="v7yizhi" password="v7yizhi" size="-5" />-->
 		<!--中佳信ltts移植环境 mysql-->
+		<!--本地 mysql-->
+		<DatabasePool name="localYizhi"  type="mysql"
+					  url="jdbc:mysql://192.168.159.135:3306/v7yizhi?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;serverTimezone=UTC"
+					  username="v7yizhi" password="V7yizhi."  size="-10" />
 		<DatabasePool name="v7yizhi"  type="mysql"
 		url="jdbc:mysql://10.33.80.137:3306/v7yizhi?useUnicode=true&amp;characterEncoding=UTF-8"
 		username="v7yizhi" password="v7yizhi" size="-10" />
@@ -35,13 +43,5 @@
 					  url="jdbc:mysql://10.33.80.133:3306/v7test?useUnicode=true&amp;characterEncoding=UTF-8"
 					  username="v7test" password="v7test" size="-10" />
 
-		<!--<DatabasePool name="fbps" sid="ccgl" type="oracle" host="192.168.159.199"-->
-					  <!--port="1521" username="c##nudev" password="nudev" size="-5" />-->
-		<!--<DatabasePool name="rbdp"  type="mysql"-->
-					  <!--url="jdbc:mysql://20.5.176.71:3306/rbdp?useUnicode=true&amp;characterEncoding=UTF-8"-->
-					  <!--username="rbdp" password="rbdp2018" size="-10" />-->
-		<!--<DatabasePool name="fbps"  type="mysql"-->
-					  <!--url="jdbc:mysql://20.5.176.71:3306/fbps?useUnicode=true&amp;characterEncoding=UTF-8"-->
-					  <!--username="fbps" password="fbps2018" size="-10" />-->
 	</Database>
 </Resource>

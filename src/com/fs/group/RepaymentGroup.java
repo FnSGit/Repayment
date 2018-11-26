@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RepaymentGroup extends Group {
-    public RepaymentGroup() {
+    public RepaymentGroup(String dbpool) {
+        dbPool=dbpool;
     }
 
     public RepaymentGroup(String groupId, String dbPool, String tableName) {
@@ -16,11 +17,10 @@ public class RepaymentGroup extends Group {
     }
 
     @Override
-    public List<Group> groupParamBuild() {
-        dbPool = "v7yizhi";
+    public  List<Group> groupParamBuild() {
         tableName = "yizhi_fkxx";
         List<Group> groupList = new ArrayList<>();
-        String sql = "SELECT plfzuhao FROM yizhi_fkxx GROUP BY plfzuhao;";
+        String sql = "SELECT plfzuhao FROM "+tableName+" GROUP BY plfzuhao;";
         ResultSet resultSet = DataBase.getResultset(dbPool, sql);
         try {
             while (resultSet.next())

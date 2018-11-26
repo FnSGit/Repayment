@@ -17,10 +17,13 @@ import java.util.List;
 
 public class RepaymentBusi extends BusiProcess {
 
+    public RepaymentBusi(String dbpool) {
+        super(dbpool);
+    }
+
 
     @Override
     public void process(List<TaskEntity> data) {
-        dbInit("v7yizhi");
         FsLogger logger = FsLogger.getLogger(this.getClass().getName());
         try {
           for (TaskEntity entity:data) {
@@ -36,9 +39,9 @@ public class RepaymentBusi extends BusiProcess {
               hkjhProcess(fkxxObj);
               logger.debug("结束执行组id:{},数据:{}" ,fkxxObj.getGroupId(),fkxxObj.getOrderno());
           }
-            Thread.sleep(1000);
+          DataBase.commit(dbpool,statement);
 
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -72,8 +75,9 @@ public class RepaymentBusi extends BusiProcess {
         int hxfs=Integer.parseInt(fkxx.getHxfs());
         int kouxifs=Integer.parseInt(fkxx.getKouxifs());
 
-        BuildPayPlan BuildPayPlan = new BuildPayPlan();
-        List<YizhiHkjihuaObj> lstHkjihua= BuildPayPlan.getPayPlan(fkxx);
+        PayPlan plan = new PayPlan(statement);
+        List<YizhiHkjihuaObj> lstHkjihua= plan.getPayPlan(fkxx);
+        plan.insertPlan(lstHkjihua,fkxx);
 
     }
 }
