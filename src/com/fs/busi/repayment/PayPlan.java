@@ -12,6 +12,7 @@ import com.fs.entity.repayment.entity.PayPlanStatic;
 import com.fs.entity.repayment.param.PayParam;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
+import com.fs.generate.target.entity.YizhiHklsxxObj;
 import com.fs.util.common.CommUtil;
 import com.fs.util.date.DateUtil;
 import com.fs.util.db.DataBase;
@@ -156,11 +157,12 @@ public class PayPlan{
         Map<String, BigDecimal>  mapgqSurplus=new HashMap<>();//溢缴挂起金额
         int hkSeq=0;//还款流水序号游标
 
-        List<yizhi_hklsxx> lstHklsxxAll=lnHkjhDao.sel_Hklius(sOrderNo, false);
-        List<yizhi_hklsxx> lstHklsxx=new ArrayList<>();
-        List<yizhi_hklsxx> lstHklsxxJm=new ArrayList<>();
+
+        List<YizhiHklsxxObj> lstHklsxxAll=lnHkjhDao.sel_Hklius(sOrderNo, false);
+        List<YizhiHklsxxObj> lstHklsxx=new ArrayList<>();
+        List<YizhiHklsxxObj> lstHklsxxJm=new ArrayList<>();
         //流水拆分
-        for (yizhi_hklsxx hklsxx : lstHklsxxAll) {
+        for (YizhiHklsxxObj hklsxx : lstHklsxxAll) {
             if (hklsxx.getDanqjmfs()==null) {
                 lstHklsxx.add(hklsxx);
             }else {
@@ -200,7 +202,7 @@ public class PayPlan{
             }
             while(dyhSum>0) {//本期没有应还金额则跳过流水匹配
                 //获取流水信息
-                yizhi_hklsxx hklsxx=null;
+                YizhiHklsxxObj hklsxx=null;
                 if(hkSeq<iHklsSize){
                     if(hkSeq>0)
                         //溢缴款大于当还，则表示上次流水结清当期
@@ -349,7 +351,7 @@ public class PayPlan{
             if(i==lstHkjihua.size()-1){
 
                 for (int j = hkSeq; j < iHklsSize; j++) {
-                    yizhi_hklsxx hklsxx=lstHklsxx.get(j);
+                    YizhiHklsxxObj hklsxx=lstHklsxx.get(j);
                     dSurplus+=hklsxx.getHkjine().doubleValue();
                 }
                 double surpRest[]=null;
@@ -432,7 +434,7 @@ public class PayPlan{
             BigDecimal jmBigDecimal=zerBigDecimal;
             BigDecimal gqBigDecimal=zerBigDecimal;
             if (hkjihua.getDqsfjqbz()==E_SHIFOUBZ.NO) {
-                for (yizhi_hklsxx hklsxx : lstHklsxxJm) {
+                for (YizhiHklsxxObj hklsxx : lstHklsxxJm) {
                     if (E_DQJMFS.ZCJM==hklsxx.getDanqjmfs()&&hkjihua.getHkriqi().equals(hklsxx.getHkriqi())) {
                         jmBigDecimal=mapjmSurplus.get(hkjihua.getHkriqi());
                         BigDecimal sjmBigDecimal=hkjihua.getYhwyj().subtract(hkjihua.getShihwyjn());

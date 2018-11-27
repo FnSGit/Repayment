@@ -1,6 +1,8 @@
 package com.fs.generate.target.entity;
 
-public class YizhiHkjihuaObj  {
+import com.fs.entity.TaskEntity;
+
+public class YizhiHkjihuaObj extends TaskEntity {
 	private String orderno;
 	private String qici;
 	private String ksriqi;
