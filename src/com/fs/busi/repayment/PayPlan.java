@@ -8,6 +8,7 @@ package com.fs.busi.repayment;
 
 import com.fs.constants.BusiEnum;
 import com.fs.constants.repayment.JihuaParam;
+import com.fs.dao.repayment.HklsDao;
 import com.fs.entity.repayment.entity.PayPlanStatic;
 import com.fs.entity.repayment.param.PayParam;
 import com.fs.generate.target.entity.YizhiFkxxObj;
@@ -16,6 +17,7 @@ import com.fs.generate.target.entity.YizhiHklsxxObj;
 import com.fs.util.common.CommUtil;
 import com.fs.util.date.DateUtil;
 import com.fs.util.db.DataBase;
+import com.fs.util.log.FsLogger;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -30,11 +32,14 @@ import java.util.Map;
 
 public class PayPlan{
 
+    private FsLogger logger = FsLogger.getLogger(this.getClass().getName());
     private  YizhiHkjihuaObj lastHkjh;
     private Statement statement;
+    private String dbpool;
 
-	public PayPlan( Statement statement) {
+	public PayPlan( String dbpool,Statement statement) {
 		this.statement = statement;
+		this.dbpool=dbpool;
 	}
 
 	/**
@@ -91,10 +96,10 @@ public class PayPlan{
 		for (int i = 0; i < lstHkjihua.size(); i++) {
 			//初始化
 			YizhiHkjihuaObj hkjihua = lstHkjihua.get(i);
-			hkjihua.setDqsfjqbz(BusiEnum.NO.getValue());
+			hkjihua.setDqsfjqbz(BusiEnum.NO.value);
 			String plfzkey = fkxx.getPlfzuhao() + fkxx.getOrderno() + hkjihua.getQici();
 			BigInteger bigintKey = BigInteger.valueOf(plfzkey.hashCode());
-			if (BusiEnum.YES.getValue().equals(fkxx.getShifcuoq()) ) {
+			if (BusiEnum.YES.value.equals(fkxx.getShifcuoq()) ) {
 
 				/*20日放款错期 */
 				if (fkxx.getFkrq().substring(6, 8).equals("20")) {
@@ -143,7 +148,7 @@ public class PayPlan{
 		}
 	}
 
-    public void getPayDetail(List<YizhiHkjihuaObj> lstHkjihua) {
+    public void getPayDetail(List<YizhiHkjihuaObj> lstHkjihua,String sOrderNo) {
 
 
         Map<String, YizhiHkjihuaObj> mapWHkjihua=new HashMap<>();//为还清期次
@@ -157,8 +162,14 @@ public class PayPlan{
         Map<String, BigDecimal>  mapgqSurplus=new HashMap<>();//溢缴挂起金额
         int hkSeq=0;//还款流水序号游标
 
+        HklsDao hklsDao = new HklsDao(dbpool);
 
-        List<YizhiHklsxxObj> lstHklsxxAll=lnHkjhDao.sel_Hklius(sOrderNo, false);
+        List<YizhiHklsxxObj> lstHklsxxAll= null;
+        try {
+            lstHklsxxAll = hklsDao.sel_hkls("orderno",sOrderNo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         List<YizhiHklsxxObj> lstHklsxx=new ArrayList<>();
         List<YizhiHklsxxObj> lstHklsxxJm=new ArrayList<>();
         //流水拆分
@@ -167,28 +178,28 @@ public class PayPlan{
                 lstHklsxx.add(hklsxx);
             }else {
                 lstHklsxxJm.add(hklsxx);
-                if (hklsxx.getDanqjmfs()==E_DQJMFS.ZCJM) {
-                    mapjmSurplus.put(hklsxx.getHkriqi(), hklsxx.getHkjine());
-                }else if (hklsxx.getDanqjmfs()==E_DQJMFS.GUAQ) {
-                    mapgqSurplus.put(hklsxx.getHkriqi(), hklsxx.getHkjine());
+                if (Integer.parseInt(hklsxx.getDanqjmfs())==JihuaParam.wyjjmzc) {
+                    mapjmSurplus.put(hklsxx.getHkriqi(), new BigDecimal(hklsxx.getHkjine()));
+                }else if (Integer.parseInt(hklsxx.getDanqjmfs())==JihuaParam.wyjjmgq) {
+                    mapgqSurplus.put(hklsxx.getHkriqi(), new BigDecimal(hklsxx.getHkjine()));
                 }
 
             }
         }
         if(CommUtil.isNull(lstHklsxx)){
-            bizlog.debug("还款流水信息表未查到数据，订单号：%s。接着处理下一条订单。", sOrderNo);
-            continue;
+            logger.debug("还款流水信息表未查到数据，订单号：{}。接着处理下一条订单。", sOrderNo);
+            return;
         }
         int iHklsSize=lstHklsxx.size();//还款信息总流水数
         for (int i=0;i<lstHkjihua.size(); ++i) {
-            yizhi_hkjihua hkjihua=lstHkjihua.get(i);
+            YizhiHkjihuaObj hkjihua=lstHkjihua.get(i);
+            hkjihua.initUniqIndx("orderno","qici");
             String sYhRiqi=hkjihua.getYhkriqi();//应还款日期
-            double dYhBenj=hkjihua.getYinghkbj().doubleValue();//应还款本金
-            double dYhLixi=hkjihua.getYinghklx().doubleValue();//应还款利息
-            double dYhFee=hkjihua.getYhfee().doubleValue();//应还费用
-            double dyhfwFee=hkjihua.getYhfwfee().doubleValue();
-            double dyhqdfFee=hkjihua.getYhqdffee().doubleValue();
-//					bizlog.debug("【订单%s还款计划】  期次：%s 序号：%s，应还日期：%s，应还本金：%s，应还利息：%s，应还费用：%s",sOrderNo,hkjihua.getQici(),i,sYhRiqi,dYhBenj,dYhLixi,dYhFee);
+            double dYhBenj=Double.parseDouble(hkjihua.getYinghkbj());//应还款本金
+            double dYhLixi=Double.parseDouble(hkjihua.getYinghklx());//应还款利息
+            double dYhFee=Double.parseDouble(hkjihua.getYhfee());//应还费用
+            double dyhfwFee=Double.parseDouble(hkjihua.getYhfwfee());
+            double dyhqdfFee=Double.parseDouble(hkjihua.getYhqdffee());
 
             double dyhSum=dYhBenj+dYhLixi+dYhFee;//应还总金额
             //精度调整为2
@@ -197,8 +208,12 @@ public class PayPlan{
 
             double dHkJine=0;//实际还款总金额
             if (dyhSum==0) {
-                hkjihua.setDqsfjqbz(E_SHIFOUBZ.YES);
-                Yizhi_hkjihuaDao.updateOne_odb2(hkjihua);
+                hkjihua.setDqsfjqbz(BusiEnum.YES.value);
+                try {
+                    DataBase.update(statement, hkjihua,"YIZHI_HKJIHUA",hkjihua.getUniqueIndx());
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
             while(dyhSum>0) {//本期没有应还金额则跳过流水匹配
                 //获取流水信息

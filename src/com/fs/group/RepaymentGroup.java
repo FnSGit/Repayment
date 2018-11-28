@@ -1,5 +1,6 @@
 package com.fs.group;
 
+import com.fs.dao.repayment.FkxxDao;
 import com.fs.util.db.DataBase;
 
 import java.sql.ResultSet;
@@ -18,9 +19,11 @@ public class RepaymentGroup extends Group {
 
     @Override
     public  List<Group> groupParamBuild() {
-        tableName = "yizhi_fkxx";
+//        tableName = "yizhi_fkxx";
+        FkxxDao fkxxDao = new FkxxDao(dbPool);
         List<Group> groupList = new ArrayList<>();
-        String sql = "SELECT plfzuhao FROM "+tableName+" GROUP BY plfzuhao;";
+//        String sql = "SELECT plfzuhao FROM "+tableName+" GROUP BY plfzuhao;";
+        String sql = fkxxDao.fkxx_Group_byPlfzuhao();
         ResultSet resultSet = DataBase.getResultset(dbPool, sql);
         try {
             while (resultSet.next())

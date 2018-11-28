@@ -10,19 +10,19 @@ public class TaskEntity {
     protected Map<String,Field[]> indexs;
     protected Field[] uniqueIndx;
     protected Field[] otherIndx;
+    protected String tableName;
     protected String taskName;
     protected String className;
     protected String groupId;
     protected Group group;
 
-    public void initUniqIndx(TaskEntity entity,String... columns) {
+    public void initUniqIndx(String... columns) {
         uniqueIndx = new Field[columns.length];
         for (int i=0;i<columns.length;++i) {
-            uniqueIndx[i] = ObjectUtil.getField(entity, columns[i]);
+            uniqueIndx[i] = ObjectUtil.getField(this, columns[i]);
         }
 
     }
-
     public Group getGroup() {
         return group;
     }
@@ -79,4 +79,12 @@ public class TaskEntity {
     public void setOtherIndx(Field[] otherIndx) {
         this.otherIndx = otherIndx;
     }
+
+    public String getTableName() {
+        if (tableName==null){
+            tableName = this.getClass().getName();
+        }
+        return tableName;
+    }
+
 }

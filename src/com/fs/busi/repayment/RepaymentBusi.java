@@ -1,6 +1,7 @@
 package com.fs.busi.repayment;
 
 import com.fs.busi.BusiProcess;
+import com.fs.dao.repayment.FkxxDao;
 import com.fs.entity.TaskEntity;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
@@ -51,7 +52,9 @@ public class RepaymentBusi extends BusiProcess {
     @Override
     public List<TaskEntity> getProcessData(Group param)  {
         List<TaskEntity> taskEntityList = new ArrayList<>();
-        String sql = "select * from yizhi_fkxx where plfzuhao ='"+param.getGroupId()+"'";
+        FkxxDao fkxxDao = new FkxxDao(dbpool);
+//        String sql = "select * from yizhi_fkxx where plfzuhao ='"+param.getGroupId()+"'";
+        String sql = fkxxDao.sel_Fkxx_ByGroupId("plfzuhao",param.getGroupId());
         ResultSet resultSet = DataBase.getResultset(param.getDbPool(),sql );
         try {
             while (resultSet.next()) {
@@ -70,7 +73,7 @@ public class RepaymentBusi extends BusiProcess {
         YizhiFkxxObj fkxx= (YizhiFkxxObj) entity;
         BigDecimal zerBigDecimal=BigDecimal.ZERO;
 
-        PayPlan plan = new PayPlan(statement);
+        PayPlan plan = new PayPlan(dbpool,statement);
         List<YizhiHkjihuaObj> lstHkjihua= plan.getPayPlan(fkxx);
         plan.insertPlan(lstHkjihua,fkxx);
 

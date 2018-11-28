@@ -21,7 +21,7 @@ public class Test {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        PayPlan plan = new PayPlan(statement);
+        PayPlan plan = new PayPlan(ConstantComm.repayment_dbpool,statement);
         String sql = "select * from yizhi_fkxx where orderno='U1D-5FJ-7HU'";
         ResultSet resultSet=DataBase.getResultset(ConstantComm.repayment_dbpool, sql);
         YizhiFkxxObj fkxx = new YizhiFkxxObj();

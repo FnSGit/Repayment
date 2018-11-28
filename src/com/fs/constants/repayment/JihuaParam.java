@@ -125,4 +125,15 @@ public class JihuaParam {
          * 末期服务费小数处理
          */
         public static final int specialPro5=5;
+        /*
+         * 违约金减免方式
+         */
+        /**
+         *违约金正常减免
+         */
+        public static final int wyjjmzc=1;
+        /**
+         *违约金正常减免
+         */
+        public static final int wyjjmgq=2;
 }
