@@ -14,6 +14,7 @@ import com.fs.entity.repayment.entity.FeeEntity;
 import com.fs.entity.repayment.entity.LixiEntity;
 import com.fs.entity.repayment.param.DateParam;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
+import com.fs.util.common.CommUtil;
 import com.fs.util.date.DateUtil;
 
 import java.math.BigDecimal;
@@ -22,6 +23,8 @@ import java.util.List;
 
 import static com.fs.entity.repayment.entity.PayPlanStatic.firstDays;
 import static com.fs.entity.repayment.entity.PayPlanStatic.lstHkjh;
+import static com.fs.entity.repayment.entity.PayPlanStatic.payedWyjRiqi;
+import static com.fs.util.date.DateUtil.getNextDate;
 
 
 public class RepayTool {
@@ -32,7 +35,7 @@ public class RepayTool {
         String year=DateUtil.getNextMonth(fkrq, month);
         //对日减一处理
         if(jiesFs==JihuaParam.jiesFs3){
-            year=DateUtil.getNextDate(year, -1);
+            year=getNextDate(year, -1);
         }
         return year;
     }
@@ -107,7 +110,7 @@ public class RepayTool {
                         //按月对日，不做处理
                         break;
                     case JihuaParam.jiesFs3:
-                        lastRiqi=DateUtil.getNextDate(lastRiqi, -1);//按月对日减一
+                        lastRiqi=getNextDate(lastRiqi, -1);//按月对日减一
                         break;
                     default:
                         break;
@@ -655,11 +658,59 @@ public class RepayTool {
             jsrq=DateUtil.getNextMonth(fkrq, qixian);
         }else if (jiesFs==JihuaParam.jiesFs3) {
             jsrq=DateUtil.getNextMonth(fkrq, qixian);
-            jsrq=DateUtil.getNextDate(jsrq, -1);
+            jsrq=getNextDate(jsrq, -1);
         }
         return jsrq;
     }
 
 
 
-}
+    public static BigDecimal calWyjin(String hkr,String yhr,double fkje,int qici,int jixiFs,int kouxiFs){
+        long days=DateUtil.getDaysDiff( yhr,hkr);//超期天数
+        BigDecimal bigZero=BigDecimal.ZERO;
+        BigDecimal bigWyj=bigZero;
+        if(qici==0){
+            if(kouxiFs!=JihuaParam.kouxiFs2&&jixiFs!=JihuaParam.jixiFs3)//上扣息且一次收息需要违约金
+                return bigZero;//零期为一次性收费，不计违约金
+        }
+
+        if (days<=0)
+            return bigZero;
+        //节假日罚息业务
+        yizhi_holiday holiday=Yizhi_holidayDao.selectOne_odb1(yhr,false);
+        if(CommUtil.isNotNull(holiday)){//应还日期不在节假日，照常收费
+            int loop=0;
+            while(true){
+                ++loop;//天数累计
+                String nextDate=getNextDate(yhr, loop);//获取下一天日期
+                yizhi_holiday holiday1=Yizhi_holidayDao.selectOne_odb1(nextDate,false);
+                if(CommUtil.isNull(holiday1)){//判断是否节假日,不是节假日还款照常收费
+                    if(hkr.equals(nextDate)) return bigZero;
+                    break;
+                }else {
+                    if (loop>=days) {//在节假日内还款，不收罚金
+                        return bigZero;
+                    }
+                }
+            }
+
+        }
+
+        /*
+         * 若确实产生违约金则记录上次违约金日期
+         */
+
+			 if(hkr.compareTo(payedWyjRiqi)>0){
+				 if(yhr.compareTo(payedWyjRiqi)<0)
+				 	days=calDays(hkr, payedWyjRiqi);
+
+				bigWyj=BigDecimal.valueOf(fkje*0.001*days).setScale(2,RoundingMode.HALF_UP);
+				payedWyjRiqi=hkr;
+			 }else {
+				return bigZero;
+			}
+			return bigWyj;
+		 }
+
+
+    }

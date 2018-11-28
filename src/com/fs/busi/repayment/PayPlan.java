@@ -155,6 +155,7 @@ public class PayPlan{
         Map<String, YizhiHkjihuaObj> mapGQHkjihua=new HashMap<>();//违约金挂起期次
         //先入表，解耦和
 
+        String zero = "0.00";
 
         String sHkriqi="";//还款流水日期记录
         double dSurplus=0;//上期多还剩余金额
@@ -227,25 +228,25 @@ public class PayPlan{
                 }else {
                     hklsxx=lstHklsxx.get(iHklsSize-1);
                     if (dSurplus!=0) {
-                        hklsxx.setHkjine(zerBigDecimal);
+                        hklsxx.setHkjine(zero);
                     } else {
                         if (dHkJine > 0) {// 未还够本期应还金额，且没有后续流水
                             sHkriqi ="";
-                            hkjihua.setDqsfjqbz(E_SHIFOUBZ.NO);
+                            hkjihua.setDqsfjqbz(BusiEnum.NO.value);
                             if (dHkJine >= dyhqdfFee) {
                                 dHkJine -= dyhqdfFee;
                                 hkjihua.setShihqdffee((new BigDecimal(
                                         dyhqdfFee)).setScale(2,
-                                        RoundingMode.HALF_UP));
+                                        RoundingMode.HALF_UP).toString());
                                 if (dHkJine >= dyhfwFee) {
                                     dHkJine -= dyhfwFee;
                                     hkjihua.setShihfwfee(new BigDecimal(
                                             dyhfwFee).setScale(2,
-                                            RoundingMode.HALF_UP));
+                                            RoundingMode.HALF_UP).toString());
                                     if (dHkJine >= dYhLixi) {
-                                        hkjihua.setShhklixi(BigDecimal.valueOf(dYhLixi).setScale(2,RoundingMode.HALF_UP));// 还利息
+                                        hkjihua.setShhklixi(BigDecimal.valueOf(dYhLixi).setScale(2,RoundingMode.HALF_UP).toString());// 还利息
                                         if (dHkJine < dYhBenj + dYhLixi) {
-                                            hkjihua.setShhkbenj(BigDecimal.valueOf(dHkJine- dYhLixi).setScale(2,RoundingMode.HALF_UP));// 还部分金额
+                                            hkjihua.setShhkbenj(BigDecimal.valueOf(dHkJine- dYhLixi).setScale(2,RoundingMode.HALF_UP).toString());// 还部分金额
                                         } else if (dHkJine > dYhBenj+ dYhLixi) {
                                             sHkriqi = hklsxx.getHkriqi();
                                             // 计算违约金
