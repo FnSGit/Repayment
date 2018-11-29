@@ -14,6 +14,7 @@ import com.fs.entity.repayment.entity.FeeEntity;
 import com.fs.entity.repayment.entity.LixiEntity;
 import com.fs.entity.repayment.param.DateParam;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
+import com.fs.generate.target.entity.YizhiHolidayObj;
 import com.fs.util.common.CommUtil;
 import com.fs.util.date.DateUtil;
 
@@ -23,7 +24,6 @@ import java.util.List;
 
 import static com.fs.entity.repayment.entity.PayPlanStatic.firstDays;
 import static com.fs.entity.repayment.entity.PayPlanStatic.lstHkjh;
-import static com.fs.entity.repayment.entity.PayPlanStatic.payedWyjRiqi;
 import static com.fs.util.date.DateUtil.getNextDate;
 
 
@@ -677,7 +677,7 @@ public class RepayTool {
         if (days<=0)
             return bigZero;
         //节假日罚息业务
-        yizhi_holiday holiday=Yizhi_holidayDao.selectOne_odb1(yhr,false);
+        YizhiHolidayObj holiday=Yizhi_holidayDao.selectOne_odb1(yhr,false);
         if(CommUtil.isNotNull(holiday)){//应还日期不在节假日，照常收费
             int loop=0;
             while(true){
@@ -694,7 +694,7 @@ public class RepayTool {
                 }
             }
 
-        }
+//        }
 
         /*
          * 若确实产生违约金则记录上次违约金日期
@@ -710,7 +710,7 @@ public class RepayTool {
 				return bigZero;
 			}
 			return bigWyj;
-		 }
+    }
 
 
     }

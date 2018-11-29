@@ -3,6 +3,7 @@ package com.fs.dao;
 import com.fs.util.db.DataBase;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,18 @@ public abstract class Dao {
         for (int i=0;i<params.length;i+=2)
             paraMap.put(params[i],params[i+1]);
         return paraMap;
+    }
+
+    public void stateClose()  {
+        try {
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void commit() {
+        DataBase.commit(dbpool,statement);
     }
 
 }
