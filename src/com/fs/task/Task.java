@@ -5,19 +5,19 @@ import com.fs.group.Group;
 import com.fs.util.log.FsLogger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
-public class Task implements Runnable{
+public  class Task implements Runnable{
     protected  String taskName;
     protected BusiProcess process;
     protected Group group;
     protected TaskVariable variable;
 
     protected List<Group> groups;
-    public Task( BusiProcess process) {
+    public Task( BusiProcess process,TaskVariable taskVariable) {
        this.taskName = process.busiName;
        this.process=process;
+       this.variable=taskVariable;
     }
 
     public Task(BusiProcess process, Group groups) {
@@ -44,19 +44,6 @@ public class Task implements Runnable{
         System.out.println("任务：【"+ taskName+"】  片段id："+group.getGroupId()+"，开始···");
     }
 
-    public  List<Task> taskFactroy() {
-        List<Task> taskList = new ArrayList<>();
-//        List<String> groups= param.getGroupIdList();
-       /* for (String id:groups){
-            param.setGroupId(id);
-            Task task = new Task(taskName, process, param);
-            taskList.add(task);
-        }*/
-       for (Group group : groups) {
-           taskList.add(new Task( process, group));
-       }
-        return taskList;
-    }
 
     public Group getGroup() {
         return group;

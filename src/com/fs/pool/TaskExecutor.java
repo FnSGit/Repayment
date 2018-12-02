@@ -3,6 +3,7 @@ package com.fs.pool;
 import com.fs.busi.BusiProcess;
 import com.fs.group.Group;
 import com.fs.task.Task;
+import com.fs.task.TaskVariable;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -30,7 +31,7 @@ public class TaskExecutor {
                 this.executorService=Executors.newCachedThreadPool();
                 break;
             default:
-                throw new Exception("构建类型错误！");
+                throw new Exception("构建executorService类型错误！");
         }
     }
 
@@ -45,9 +46,9 @@ public class TaskExecutor {
             executorService.execute(task);
     }
 
-    public void batchExecute(List<Group> groupList, BusiProcess process) {
-        Task task = new Task(process);
+    public void batchExecute(List<Group> groupList, BusiProcess process, TaskVariable variable) {
         for (Group group : groupList) {
+            Task task = new Task(process,variable);
             task.setGroup(group);
             executorService.execute(task);
         }

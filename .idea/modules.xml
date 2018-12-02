@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Repayment.iml" filepath="$PROJECT_DIR$/.idea/Repayment.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FengSuperBatch.iml" filepath="$PROJECT_DIR$/.idea/FengSuperBatch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/generate/Generate.iml" filepath="$PROJECT_DIR$/generate/Generate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MapperReduce/MapperReduce.iml" filepath="$PROJECT_DIR$/MapperReduce/MapperReduce.iml" />
+      <module fileurl="file://$PROJECT_DIR$/repaymentbusi/RepaymentBusiness.iml" filepath="$PROJECT_DIR$/repaymentbusi/RepaymentBusiness.iml" />
       <module fileurl="file://$PROJECT_DIR$/Test/Test.iml" filepath="$PROJECT_DIR$/Test/Test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/generate/generate.iml" filepath="$PROJECT_DIR$/generate/generate.iml" />
     </modules>
   </component>
 </project>

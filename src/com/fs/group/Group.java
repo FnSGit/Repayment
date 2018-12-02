@@ -1,7 +1,8 @@
 package com.fs.group;
 
-import com.fs.task.TaskVariable;
+import com.fs.util.db.DataBase;
 
+import java.sql.Statement;
 import java.util.List;
 
 public abstract class Group  {
@@ -10,22 +11,19 @@ public abstract class Group  {
     protected String groupName;
     protected String dbPool;
     protected String tableName;
+    protected Statement statement;
 
     protected List<String> groupIdList;
 
-    public Group(TaskVariable taskVariable) {
-       this.dbPool=taskVariable.dbpool;
-    }
-
-    public Group(String groupId, String dbPool, String tableName) {
-        this.groupId = groupId;
-        this.dbPool = dbPool;
-        this.tableName = tableName;
-    }
 
     public Group() {
     }
-
+    public Group(String groupId) {
+        this.groupId=groupId;
+    }
+    protected void defaultStatement() {
+         statement = DataBase.getStatement(dbPool);
+    }
     public abstract  List<Group> groupParamBuild() ;
 
     public String getGroupId() {
