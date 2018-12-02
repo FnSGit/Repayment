@@ -7,6 +7,7 @@ import com.fs.group.Group;
 import com.fs.group.RepaymentGroup;
 import com.fs.pool.TaskExecutor;
 import com.fs.task.Task;
+import com.fs.task.repayment.RepaymentVariable;
 
 
 public class Test {
@@ -16,13 +17,13 @@ public class Test {
 
     private static void threadTest() throws Exception {
         TaskExecutor executor = new TaskExecutor(10,TaskExecutor.ExecutorService_fixed);
-        BusiProcess process=new RepaymentBusi(ConstantComm.repayment_dbpool);
-        Group group = new RepaymentGroup(ConstantComm.repayment_dbpool);
+
+        BusiProcess process=new RepaymentBusi(new RepaymentVariable("还款计划",ConstantComm.repayment_dbpool));
+        Group group = new RepaymentGroup(new RepaymentVariable("还款计划",ConstantComm.repayment_dbpool));
 
 //        DataBase.Prepare();
-        Task task = new Task("还款计划",process,group.groupParamBuild());
 ////        executor.execute(task1);
-         executor.batchExecute(task.taskFactroy());
+         executor.batchExecute(group.groupParamBuild());
 
 
         executor.shutdown();

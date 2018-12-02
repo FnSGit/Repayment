@@ -1,5 +1,7 @@
 package com.fs.pool;
 
+import com.fs.busi.BusiProcess;
+import com.fs.group.Group;
 import com.fs.task.Task;
 
 import java.util.List;
@@ -43,6 +45,13 @@ public class TaskExecutor {
             executorService.execute(task);
     }
 
+    public void batchExecute(List<Group> groupList, BusiProcess process) {
+        Task task = new Task(process);
+        for (Group group : groupList) {
+            task.setGroup(group);
+            executorService.execute(task);
+        }
+    }
     public void shutdown() {
         this.executorService.shutdown();
     }

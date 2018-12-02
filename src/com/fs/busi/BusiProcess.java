@@ -2,6 +2,7 @@ package com.fs.busi;
 
 import com.fs.entity.TaskEntity;
 import com.fs.group.Group;
+import com.fs.task.TaskVariable;
 import com.fs.util.db.DataBase;
 
 import java.sql.SQLException;
@@ -10,16 +11,19 @@ import java.util.List;
 
 public abstract class  BusiProcess {
 
-
-
+     public String busiName;
+     protected TaskVariable variable;
      protected  String dbpool;
      protected  Statement statement;
 
      public BusiProcess() {
      }
-     public BusiProcess(String dbpool) {
-          dbInit(dbpool);
+     public BusiProcess(TaskVariable taskVariable) {
+          dbInit(taskVariable.dbpool);
+          this.variable=taskVariable;
+          busiName=taskVariable.taskName;
      }
+
      protected  void dbInit(String db) {
           DataBase.setFalseCommit(db);
           dbpool=db;

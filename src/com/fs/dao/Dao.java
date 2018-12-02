@@ -2,27 +2,27 @@ package com.fs.dao;
 
 import com.fs.util.db.DataBase;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.fs.entity.repayment.staticData.PayPlanStatic.statementMap;
+
 public abstract class Dao {
     protected String dbpool;
-    protected Statement statement;
-    protected Connection connection;
+
 
     public Dao(String dbpool) {
-       initDb(dbpool);
+        this.dbpool = dbpool;
+        createStatement();
     }
 
-    public void initDb(String dbpool) {
-        this.dbpool=dbpool;
-        this.connection = DataBase.getConn(dbpool);
-        this.statement = DataBase.getStatement(dbpool);
-    }
+    protected abstract void createStatement();
 
+    protected void defaultStatement() {
+        statementMap.put(this.getClass().getName(), DataBase.getStatement(dbpool));
+    }
     protected Map<String, String> getParamMap(String... params) {
         Map<String, String> paraMap = new HashMap<>();
         for (int i=0;i<params.length;i+=2)
@@ -30,16 +30,22 @@ public abstract class Dao {
         return paraMap;
     }
 
-    public void stateClose()  {
+    public void stateClose(String daoName)  {
         try {
-            statement.close();
+            statementMap.get(daoName).close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void commit() {
-        DataBase.commit(dbpool,statement);
+    public void commit(String daoName) {
+        DataBase.commit(dbpool,statementMap.get(daoName));
+    }
+
+    public Statement getStatement() {
+        if (statementMap.get(dbpool)==null)
+            defaultStatement();
+        return statementMap.get(this.getClass().getName());
     }
 
 }

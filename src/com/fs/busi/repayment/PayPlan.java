@@ -8,8 +8,9 @@ package com.fs.busi.repayment;
 
 import com.fs.constants.BusiEnum;
 import com.fs.constants.repayment.JihuaParam;
+import com.fs.dao.repayment.HkjhDao;
 import com.fs.dao.repayment.HklsDao;
-import com.fs.entity.repayment.entity.PayPlanStatic;
+import com.fs.entity.repayment.staticData.PayPlanStatic;
 import com.fs.entity.repayment.param.PayParam;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
@@ -34,11 +35,9 @@ public class PayPlan{
 
     private FsLogger logger = FsLogger.getLogger(this.getClass().getName());
     private  YizhiHkjihuaObj lastHkjh;
-    private Statement statement;
     private String dbpool;
 
-	public PayPlan( String dbpool,Statement statement) {
-		this.statement = statement;
+	public PayPlan( String dbpool) {
 		this.dbpool=dbpool;
 	}
 
@@ -93,6 +92,7 @@ public class PayPlan{
     public void insertPlan(List<YizhiHkjihuaObj> lstHkjihua, YizhiFkxxObj fkxx) {
 
 		lastHkjh = null;
+        HkjhDao hkjhDao = new HkjhDao(dbpool);
 		for (int i = 0; i < lstHkjihua.size(); i++) {
 			//初始化
 			YizhiHkjihuaObj hkjihua = lstHkjihua.get(i);
@@ -141,7 +141,7 @@ public class PayPlan{
 			try {
 //                FsLogger logger = FsLogger.getLogger(this.getClass().getName());
 //                logger.debug("insertSql:{}", PrepareSql.insertSql(hkjihua, "yizhi_hkjihua"));
-				DataBase.insert(statement, hkjihua, "yizhi_hkjihua");
+				DataBase.insert(hkjhDao.getStatement(), hkjihua, "yizhi_hkjihua");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}

@@ -1,4 +1,14 @@
 package com.fs.dao.repayment;
 
-public class HkjhDao {
+import com.fs.dao.Dao;
+
+public class HkjhDao extends Dao {
+    public HkjhDao(String dbpool) {
+        super(dbpool);
+    }
+
+    @Override
+    protected void createStatement() {
+        defaultStatement();
+    }
 }

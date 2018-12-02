@@ -6,6 +6,7 @@ import com.fs.entity.TaskEntity;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
 import com.fs.group.Group;
+import com.fs.task.TaskVariable;
 import com.fs.util.db.DataBase;
 import com.fs.util.log.FsLogger;
 import com.fs.util.object.ObjectUtil;
@@ -18,8 +19,8 @@ import java.util.List;
 
 public class RepaymentBusi extends BusiProcess {
 
-    public RepaymentBusi(String dbpool) {
-        super(dbpool);
+    public RepaymentBusi(TaskVariable taskVariable) {
+        super(taskVariable);
     }
 
 
@@ -55,14 +56,15 @@ public class RepaymentBusi extends BusiProcess {
         FkxxDao fkxxDao = new FkxxDao(dbpool);
 //        String sql = "select * from yizhi_fkxx where plfzuhao ='"+param.getGroupId()+"'";
         String sql = fkxxDao.sel_Fkxx_ByGroupId("plfzuhao",param.getGroupId());
-        ResultSet resultSet = DataBase.getResultset(param.getDbPool(),sql );
         try {
+        ResultSet resultSet = DataBase.getResultset(statement,sql );
             while (resultSet.next()) {
                 TaskEntity taskEntity = (TaskEntity) ObjectUtil.loadResult(YizhiFkxxObj.class,resultSet);
                 taskEntity.setGroupId(param.getGroupId());
                 taskEntity.setGroup(param);
                 taskEntityList.add(taskEntity);
             }
+            statement.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -73,7 +75,7 @@ public class RepaymentBusi extends BusiProcess {
         YizhiFkxxObj fkxx= (YizhiFkxxObj) entity;
         BigDecimal zerBigDecimal=BigDecimal.ZERO;
 
-        PayPlan plan = new PayPlan(dbpool,statement);
+        PayPlan plan = new PayPlan(dbpool);
         List<YizhiHkjihuaObj> lstHkjihua= plan.getPayPlan(fkxx);
         plan.insertPlan(lstHkjihua,fkxx);
 

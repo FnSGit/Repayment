@@ -22,8 +22,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-import static com.fs.entity.repayment.entity.PayPlanStatic.firstDays;
-import static com.fs.entity.repayment.entity.PayPlanStatic.lstHkjh;
+import static com.fs.entity.repayment.staticData.PayPlanStatic.firstDays;
+import static com.fs.entity.repayment.staticData.PayPlanStatic.lstHkjh;
 import static com.fs.util.date.DateUtil.getNextDate;
 
 

@@ -1,8 +1,10 @@
 package com.fs.group;
 
+import com.fs.task.TaskVariable;
+
 import java.util.List;
 
-public abstract class Group {
+public abstract class Group  {
 
     protected String groupId;
     protected String groupName;
@@ -11,6 +13,9 @@ public abstract class Group {
 
     protected List<String> groupIdList;
 
+    public Group(TaskVariable taskVariable) {
+       this.dbPool=taskVariable.dbpool;
+    }
 
     public Group(String groupId, String dbPool, String tableName) {
         this.groupId = groupId;

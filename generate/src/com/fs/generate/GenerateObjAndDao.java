@@ -7,7 +7,7 @@ public class GenerateObjAndDao {
 
 	public static String DbPool = "v7yizhi";
 	
-	public static String tableName="yizhi_fkxx";
+	public static String tableName="yizhi_weiyjinls";
 	
 	public static String condition="";
 	

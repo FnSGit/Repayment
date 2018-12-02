@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RepaymentGroup extends Group {
-    public RepaymentGroup(String dbpool) {
-        dbPool=dbpool;
-    }
+
 
     public RepaymentGroup(String groupId, String dbPool, String tableName) {
         super(groupId, dbPool, tableName);

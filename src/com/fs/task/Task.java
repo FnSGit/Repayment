@@ -11,19 +11,19 @@ import java.util.List;
 public class Task implements Runnable{
     protected  String taskName;
     protected BusiProcess process;
-    protected Group param;
+    protected Group group;
+    protected TaskVariable variable;
 
     protected List<Group> groups;
-    public Task(String taskName, BusiProcess process, Group param) {
-       this.taskName = taskName;
+    public Task( BusiProcess process) {
+       this.taskName = process.busiName;
        this.process=process;
-       this.param=param;
     }
 
-    public Task(String taskName, BusiProcess process, List<Group> groups) {
-        this.taskName = taskName;
+    public Task(BusiProcess process, Group groups) {
+        this.taskName = process.busiName;
         this.process=process;
-        this.groups = groups;
+        this.group = groups;
     }
     @Override
     public void run() {
@@ -32,16 +32,16 @@ public class Task implements Runnable{
         logger.setLogPath("log"+File.separator+ taskName);
 
        start();
-        process.process(process.getProcessData(param));
+        process.process(process.getProcessData(group));
        end();
     }
 
     private void end() {
-        System.out.println("任务：【"+ taskName+"】  片段id："+param.getGroupId()+"，结束···");
+        System.out.println("任务：【"+ taskName+"】  片段id："+group.getGroupId()+"，结束···");
     }
 
     private void start() {
-        System.out.println("任务：【"+ taskName+"】  片段id："+param.getGroupId()+"，开始···");
+        System.out.println("任务：【"+ taskName+"】  片段id："+group.getGroupId()+"，开始···");
     }
 
     public  List<Task> taskFactroy() {
@@ -52,8 +52,17 @@ public class Task implements Runnable{
             Task task = new Task(taskName, process, param);
             taskList.add(task);
         }*/
-       for (Group group : groups)
-           taskList.add(new Task(taskName, process, group));
+       for (Group group : groups) {
+           taskList.add(new Task( process, group));
+       }
         return taskList;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
     }
 }

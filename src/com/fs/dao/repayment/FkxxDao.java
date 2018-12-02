@@ -10,6 +10,11 @@ public class FkxxDao extends Dao {
         super(dbpool);
     }
 
+    @Override
+    protected void createStatement() {
+        defaultStatement();
+    }
+
     /**
      * 按分组号获取数据
      * @param params
