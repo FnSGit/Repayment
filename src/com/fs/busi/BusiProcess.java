@@ -6,7 +6,6 @@ import com.fs.task.Task;
 import com.fs.task.TaskVariable;
 import com.fs.util.db.DataBase;
 
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +20,19 @@ public abstract class  BusiProcess {
      public BusiProcess() {
      }
      public BusiProcess(TaskVariable taskVariable) {
-          dbInit(taskVariable.dbpool);
           this.variable=taskVariable;
           busiName=taskVariable.taskName;
+          initDb(taskVariable.dbpool);
      }
 
-     protected  void dbInit(String db) {
+     protected  void initDb(String db) {
           DataBase.setFalseCommit(db);
           dbpool=db;
-          try {
-               statement=DataBase.getConn(db).createStatement();
-          } catch (SQLException e) {
-               e.printStackTrace();
-          }
+          getStatement(db);
+     }
+
+     protected void getStatement(String dbpool) {
+          statement = DataBase.getStatement(dbpool);
      }
      public abstract List<TaskEntity> getProcessData(Group param);
 

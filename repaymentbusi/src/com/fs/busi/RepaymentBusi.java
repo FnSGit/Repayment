@@ -23,6 +23,15 @@ public class RepaymentBusi extends BusiProcess {
         super(taskVariable);
     }
 
+    @Override
+    protected void getStatement(String dbpool) {
+        try {
+            statement=DataBase.getConn(dbpool).createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,ResultSet.CONCUR_UPDATABLE);
+            statement.setFetchSize(10000);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void process(List<TaskEntity> data) {
@@ -77,7 +86,7 @@ public class RepaymentBusi extends BusiProcess {
         YizhiFkxxObj fkxx= (YizhiFkxxObj) entity;
         BigDecimal zerBigDecimal=BigDecimal.ZERO;
 
-        PayPlan plan = new PayPlan(dbpool);
+        PayPlan plan = new PayPlan(dbpool,statement);
         List<YizhiHkjihuaObj> lstHkjihua= plan.getPayPlan(fkxx);
         plan.insertPlan(lstHkjihua,fkxx);
 

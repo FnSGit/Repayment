@@ -1,11 +1,16 @@
 package com.fs.dao;
 
+import java.sql.Statement;
 import java.util.Map;
 
 public class FkxxDao extends Dao {
 
     public FkxxDao(String dbpool) {
         super(dbpool);
+    }
+
+    public FkxxDao(String dbpool, Statement statement) {
+        super(dbpool, statement);
     }
 
     @Override

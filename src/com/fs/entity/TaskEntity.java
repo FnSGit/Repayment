@@ -1,6 +1,7 @@
 package com.fs.entity;
 
 import com.fs.group.Group;
+import com.fs.util.character.StringUtil;
 import com.fs.util.object.ObjectUtil;
 
 import java.lang.reflect.Field;
@@ -15,6 +16,16 @@ public class TaskEntity {
     protected String className;
     protected String groupId;
     protected Group group;
+
+    public String getTable() {
+        String entity = this.getClass().getName();
+        String classNm[] =entity.split("\\.");
+        entity = classNm[classNm.length - 1];
+        entity = entity.replaceFirst("Obj","");
+        entity = entity.replaceFirst("^[A-Z]", entity.substring(0,1).toLowerCase());
+        entity = StringUtil.humpToLine(entity);
+        return entity;
+    }
 
     public void initUniqIndx(String... columns) {
         uniqueIndx = new Field[columns.length];
@@ -80,11 +91,5 @@ public class TaskEntity {
         this.otherIndx = otherIndx;
     }
 
-    public String getTableName() {
-        if (tableName==null){
-            tableName = this.getClass().getName();
-        }
-        return tableName;
-    }
 
 }

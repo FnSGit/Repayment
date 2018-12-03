@@ -6,15 +6,19 @@
  */
 package com.fs.busi.payplan;
 
+import com.fs.busi.RepayTool;
 import com.fs.constant.JihuaParam;
 import com.fs.constants.BusiEnum;
 import com.fs.dao.HkjhDao;
 import com.fs.dao.HklsDao;
+import com.fs.dao.HolidayDao;
 import com.fs.entity.param.PayParam;
 import com.fs.entity.staticData.PayPlanStatic;
 import com.fs.generate.target.entity.YizhiFkxxObj;
 import com.fs.generate.target.entity.YizhiHkjihuaObj;
 import com.fs.generate.target.entity.YizhiHklsxxObj;
+import com.fs.task.RepaymentVariable;
+import com.fs.task.TaskVariable;
 import com.fs.util.common.CommUtil;
 import com.fs.util.date.DateUtil;
 import com.fs.util.db.DataBase;
@@ -24,10 +28,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.fs.busi.RepayTool.calWyjin;
+import static com.fs.busi.RepayTool.moPingYjk;
 
 
 public class PayPlan{
@@ -35,9 +43,11 @@ public class PayPlan{
     private FsLogger logger = FsLogger.getLogger(this.getClass().getName());
     private  YizhiHkjihuaObj lastHkjh;
     private String dbpool;
+    private Statement statement;
 
-	public PayPlan( String dbpool) {
+	public PayPlan(String dbpool, Statement statement, RepaymentVariable repaymentVariable) {
 		this.dbpool=dbpool;
+		this.statement=statement;
 	}
 
 	/**
@@ -90,10 +100,10 @@ public class PayPlan{
 
     public void insertPlan(List<YizhiHkjihuaObj> lstHkjihua, YizhiFkxxObj fkxx) {
 
-		lastHkjh = null;
-        HkjhDao hkjhDao = new HkjhDao(dbpool);
-		for (int i = 0; i < lstHkjihua.size(); i++) {
-			//初始化
+        lastHkjh = null;
+//        HkjhDao hkjhDao = new HkjhDao(dbpool);
+        for (int i = 0; i < lstHkjihua.size(); i++) {
+            //初始化
 			YizhiHkjihuaObj hkjihua = lstHkjihua.get(i);
 			hkjihua.setDqsfjqbz(BusiEnum.NO.value);
 			String plfzkey = fkxx.getPlfzuhao() + fkxx.getOrderno() + hkjihua.getQici();
@@ -140,29 +150,33 @@ public class PayPlan{
 			try {
 //                FsLogger logger = FsLogger.getLogger(this.getClass().getName());
 //                logger.debug("insertSql:{}", PrepareSql.insertSql(hkjihua, "yizhi_hkjihua"));
-				DataBase.insert(hkjhDao.getStatement(), hkjihua, "yizhi_hkjihua");
+				DataBase.insert(statement, hkjihua, "yizhi_hkjihua");
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-    public void getPayDetail(List<YizhiHkjihuaObj> lstHkjihua,String sOrderNo) {
+    public void getPayDetail(List<YizhiHkjihuaObj> lstHkjihua,YizhiFkxxObj fkxxObj) {
 
-
-        Map<String, YizhiHkjihuaObj> mapWHkjihua=new HashMap<>();//为还清期次
+        PayParam payParam = new PayParam(fkxxObj);
+        String sOrderNo=fkxxObj.getOrderno();
+        double dfkje = Double.parseDouble(fkxxObj.getFkje());
+        int hxfs = Integer.parseInt(fkxxObj.getHxfs());
+        int kouxifs = Integer.parseInt(fkxxObj.getKouxifs());
+        Map<String, YizhiHkjihuaObj> mapWHkjihua=new HashMap<>();//未还清期次
         Map<String, YizhiHkjihuaObj> mapGQHkjihua=new HashMap<>();//违约金挂起期次
-        //先入表，解耦和
 
         String zero = "0.00";
-
+        BigDecimal zerBigDecimal = BigDecimal.ZERO;
         String sHkriqi="";//还款流水日期记录
         double dSurplus=0;//上期多还剩余金额
         Map<String, BigDecimal>  mapjmSurplus=new HashMap<>();//溢缴减免金额
         Map<String, BigDecimal>  mapgqSurplus=new HashMap<>();//溢缴挂起金额
         int hkSeq=0;//还款流水序号游标
 
-        HklsDao hklsDao = new HklsDao(dbpool);
+        HklsDao hklsDao = new HklsDao(dbpool,statement);
+        HolidayDao holidayDao = new HolidayDao(dbpool, statement);
 
         List<YizhiHklsxxObj> lstHklsxxAll= null;
         try {
@@ -249,31 +263,35 @@ public class PayPlan{
                                         } else if (dHkJine > dYhBenj+ dYhLixi) {
                                             sHkriqi = hklsxx.getHkriqi();
                                             // 计算违约金
-                                            BigDecimal lwyjin = calWyjin(sHkriqi, sYhRiqi,dfkje, i, hxfs, kouxifs);
-                                            hkjihua.setYhwyj(lwyjin.setScale(2,RoundingMode.HALF_UP));
-                                            hkjihua.setShhkbenj(BigDecimal.valueOf(dYhBenj).setScale(2,RoundingMode.HALF_UP));// 还本金金额
-                                            hkjihua.setShihfee(BigDecimal.valueOf(dHkJine- dYhBenj- dYhLixi).setScale(2,RoundingMode.HALF_UP));// 换部分费用
+                                            BigDecimal lwyjin = calWyjin(payParam,sHkriqi, sYhRiqi, i, holidayDao, kouxifs);
+                                            hkjihua.setYhwyj(lwyjin.setScale(2,RoundingMode.HALF_UP).toString());
+                                            hkjihua.setShhkbenj(BigDecimal.valueOf(dYhBenj).setScale(2,RoundingMode.HALF_UP).toString());// 还本金金额
+                                            hkjihua.setShihfee(BigDecimal.valueOf(dHkJine- dYhBenj- dYhLixi).setScale(2,RoundingMode.HALF_UP).toString());// 换部分费用
                                         }
                                     } else if (dHkJine < dYhLixi) {
                                         hkjihua.setShhklixi(BigDecimal
                                                 .valueOf(dHkJine)
                                                 .setScale(
                                                         2,
-                                                        RoundingMode.HALF_UP));// 还部分利息
+                                                        RoundingMode.HALF_UP).toString());// 还部分利息
                                     }
                                 } else {
                                     hkjihua.setShihfwfee(new BigDecimal(
                                             dHkJine).setScale(2,
-                                            RoundingMode.HALF_UP));
+                                            RoundingMode.HALF_UP).toString());
                                 }
                             } else {
                                 hkjihua.setShihqdffee((new BigDecimal(
                                         dyhqdfFee)).setScale(2,
-                                        RoundingMode.HALF_UP));
+                                        RoundingMode.HALF_UP).toString());
                             }
 
                             hkjihua.setHkriqi(sHkriqi);
-                            Yizhi_hkjihuaDao.updateOne_odb2(hkjihua);// 更新还款计划
+                            try {
+                                DataBase.update(statement,hkjihua,hkjihua.getTable(),hkjihua.getUniqueIndx());// 更新还款计划
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
                             mapWHkjihua.put(hkjihua.getOrderno()+"-"+hkjihua.getQici(), hkjihua);
                         }
                         break;
@@ -282,7 +300,7 @@ public class PayPlan{
 
                 dHkJine+=dSurplus;
                 if(dHkJine<dyhSum)
-                    dHkJine+=hklsxx.getHkjine().doubleValue();
+                    dHkJine+=Double.parseDouble(hklsxx.getHkjine());
 
                 dSurplus=0;//清空剩余金额
 
@@ -302,16 +320,20 @@ public class PayPlan{
                     hkjihua.setShihqdffee(hkjihua.getYhqdffee());
                     //计算违约金
                     BigDecimal lwyjin=calWyjin(sHkriqi, sYhRiqi,dfkje,i,hxfs,kouxifs);
-                    hkjihua.setYhwyj(lwyjin.setScale(2,RoundingMode.HALF_UP));
+                    hkjihua.setYhwyj(lwyjin.setScale(2,RoundingMode.HALF_UP).toString());
 
                     if (lwyjin.compareTo(zerBigDecimal)>0) {
 //									hkjihua.setDqsfjqbz(E_SHIFOUBZ.NO);
                         mapWHkjihua.put(hkjihua.getOrderno()+"-"+hkjihua.getQici(), hkjihua);
                     }else {
-                        hkjihua.setDqsfjqbz(E_SHIFOUBZ.YES);
+                        hkjihua.setDqsfjqbz(BusiEnum.YES.value);
                     }
 
-                    Yizhi_hkjihuaDao.updateOne_odb2(hkjihua);//更新还款计划
+                    try {
+                        DataBase.update(statement,hkjihua,hkjihua.getTable(),hkjihua.getUniqueIndx());// 更新还款计划
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }else if(dHkJine>dyhSum){//多还情况
                     sHkriqi=hklsxx.getHkriqi();
@@ -325,7 +347,216 @@ public class PayPlan{
                     hkjihua.setShihqdffee(hkjihua.getYhqdffee());
                     //计算违约金
                     BigDecimal lwyjin=calWyjin(sHkriqi, sYhRiqi,dfkje,i,hxfs,kouxifs);
-                    hkjihua.setYhwyj(lwyjin.setScale(2,RoundingMode.HALF_UP));
+                    hkjihua.setYhwyj(lwyjin.setScale(2,RoundingMode.HALF_UP).toString());
+
+                    //多余金额，计算实还违约金
+                    double dExtra=dHkJine-dyhSum;
+                    if (JihuaParam.specialPro4==payParam.getSpecialPro()) {//不抵扣违约金
+                        if (lwyjin.compareTo(zerBigDecimal)==0) {
+                            hkjihua.setDqsfjqbz(BusiEnum.YES.value);
+                        }
+                        dSurplus=dExtra;
+                    }else {
+                        double dlwyjin=lwyjin.doubleValue();
+                        if(dExtra==dlwyjin){//抹平违约金
+                            hkjihua.setDqsfjqbz(BusiEnum.YES.value);
+                            hkjihua.setShihwyjn(lwyjin.setScale(2,RoundingMode.HALF_UP).toString());
+                        }else if(dExtra<dlwyjin){//不够还违约金
+                            //								hkjihua.setDqsfjqbz(E_SHIFOUBZ.NO);
+                            mapWHkjihua.put(hkjihua.getOrderno()+"-"+hkjihua.getQici(), hkjihua);
+                            hkjihua.setShihwyjn(BigDecimal.valueOf(dExtra).setScale(2,RoundingMode.HALF_UP).toString());
+                        }else {//抹平违约金后剩余
+                            hkjihua.setShihwyjn(lwyjin.setScale(2,RoundingMode.HALF_UP).toString());
+                            hkjihua.setDqsfjqbz(BusiEnum.YES.value);
+                            dSurplus=dExtra-dlwyjin;
+
+                        }
+                    }
+                    if(i==lstHkjihua.size()-1){
+                        hkjihua.setYijiaok(new BigDecimal(dSurplus).setScale(2,RoundingMode.HALF_UP).toString());
+                    }
+                    try {
+                        DataBase.update(statement,hkjihua,hkjihua.getTable(),hkjihua.getUniqueIndx());// 更新还款计划
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                } else {
+                    ++hkSeq;//金额不够，查看下一条
+                }
+
+
+            }
+            //剩余溢缴款+多余流水溢缴款
+//					if(i==lstHkjihua.size()-1&&hkSeq<iHklsSize){
+            if(i==lstHkjihua.size()-1){
+
+                for (int j = hkSeq; j < iHklsSize; j++) {
+                    YizhiHklsxxObj hklsxx=lstHklsxx.get(j);
+                    dSurplus+=Double.parseDouble(hklsxx.getHkjine());
+                }
+                double surpRest[]=null;
+                if(dSurplus>0){
+                    //抹平渠道返费
+                    if(hkjihua.getYhqdffee().compareTo(hkjihua.getShihqdffee())>0){
+                        surpRest=moPingYjk(new BigDecimal(hkjihua.getYhqdffee()), new BigDecimal(hkjihua.getShihqdffee()), dSurplus);
+                        if(surpRest[0]==0){
+                            hkjihua.setShihqdffee(hkjihua.getYhqdffee());
+                            dSurplus=surpRest[1];
+
+                        }else if (surpRest[0]==1) {
+                            hkjihua.setShihqdffee(hkjihua.getShihqdffee().add(new BigDecimal(dSurplus)).setScale(2,RoundingMode.HALF_UP));
+                            dSurplus=0;
+
+                        }
+                    }
+                    //抹平服务费
+                    if(hkjihua.getYhfwfee().compareTo(hkjihua.getShihfwfee())>0){
+                        surpRest=moPingYjk(hkjihua.getYhfwfee(),hkjihua.getShihfwfee(), dSurplus);
+                        if(surpRest[0]==0){
+                            hkjihua.setShihfwfee(hkjihua.getYhfwfee());
+                            dSurplus=surpRest[1];
+                        }else if (surpRest[0]==1) {
+                            hkjihua.setShihfwfee(hkjihua.getShihfwfee().add(new BigDecimal(dSurplus)).setScale(2,RoundingMode.HALF_UP));
+                            dSurplus=0;
+                        }
+                    }
+                    //抹平利息
+                    if(hkjihua.getYinghklx().compareTo(hkjihua.getShhklixi())>0){
+                        surpRest=moPingYjk(hkjihua.getYinghklx(),hkjihua.getShhklixi(), dSurplus);
+                        if(surpRest[0]==0){
+                            hkjihua.setShhklixi(hkjihua.getYinghklx());
+                            dSurplus=surpRest[1];
+                        }else if (surpRest[0]==1) {
+                            hkjihua.setShhklixi(hkjihua.getShhklixi().add(new BigDecimal(dSurplus)).setScale(2,RoundingMode.HALF_UP));
+                            dSurplus=0;
+                        }
+                    }
+                    //抹平本金
+                    if(hkjihua.getYinghkbj().compareTo(hkjihua.getShhkbenj())>0){
+                        surpRest=moPingYjk(hkjihua.getYinghkbj(),hkjihua.getShhkbenj(), dSurplus);
+                        if(surpRest[0]==0){
+                            hkjihua.setShhkbenj(hkjihua.getYinghkbj());
+                            dSurplus=surpRest[1];
+                        }else if (surpRest[0]==1) {
+                            hkjihua.setShhkbenj(hkjihua.getShhkbenj().add(new BigDecimal(dSurplus)).setScale(2,RoundingMode.HALF_UP));
+                            dSurplus=0;
+                        }
+                    }
+                    //抹平违约金
+                    if(hkjihua.getYhwyj().compareTo(hkjihua.getShihwyjn())>0){
+                        surpRest=moPingYjk(hkjihua.getYhwyj(),hkjihua.getShihwyjn(), dSurplus);
+                        if(surpRest[0]==0){
+                            hkjihua.setShihwyjn(hkjihua.getYhwyj());
+                            dSurplus=surpRest[1];
+                        }else if (surpRest[0]==1) {
+                            hkjihua.setShihwyjn(hkjihua.getShihwyjn().add(new BigDecimal(dSurplus)).setScale(2,RoundingMode.HALF_UP));
+                            dSurplus=0;
+                        }
+                    }
+                }
+
+                hkjihua.setYijiaok(new BigDecimal(dSurplus).setScale(2,RoundingMode.HALF_UP));
+                if (new BigDecimal(dyhSum).compareTo(hkjihua.getShhklixi().add(hkjihua.getShhkbenj()).add(hkjihua.getShihfee()))==0
+                        &&hkjihua.getYhwyj().compareTo(hkjihua.getShihwyjn())==0) {
+                    hkjihua.setDqsfjqbz(E_SHIFOUBZ.YES);
+                    //最后一期记录
+                    mapWHkjihua.put(hkjihua.getOrderno()+"-"+hkjihua.getQici(), hkjihua);
+                }else {
+                    mapWHkjihua.put(hkjihua.getOrderno()+"-"+hkjihua.getQici(), hkjihua);
+                }
+                Yizhi_hkjihuaDao.updateOne_odb2(hkjihua);
+            }
+
+        }
+        //减免金额处理
+        for (Map.Entry<String, yizhi_hkjihua> mapEntryhkjihua : mapWHkjihua.entrySet()) {
+            yizhi_hkjihua hkjihua=mapEntryhkjihua.getValue();
+            BigDecimal jmBigDecimal=zerBigDecimal;
+            BigDecimal gqBigDecimal=zerBigDecimal;
+            if (hkjihua.getDqsfjqbz()==E_SHIFOUBZ.NO) {
+                for (yizhi_hklsxx hklsxx : lstHklsxxJm) {
+                    if (E_DQJMFS.ZCJM==hklsxx.getDanqjmfs()&&hkjihua.getHkriqi().equals(hklsxx.getHkriqi())) {
+                        jmBigDecimal=mapjmSurplus.get(hkjihua.getHkriqi());
+                        BigDecimal sjmBigDecimal=hkjihua.getYhwyj().subtract(hkjihua.getShihwyjn());
+                        if (jmBigDecimal.compareTo(sjmBigDecimal)<=0) {
+                            hkjihua.setZcjmfaxi(jmBigDecimal.setScale(2,RoundingMode.HALF_UP));
+                            if (hkjihua.getYhwyj().compareTo(hkjihua.getShihwyjn().add(jmBigDecimal))==0) {
+                                hkjihua.setDqsfjqbz(E_SHIFOUBZ.YES);
+                            }
+                            mapjmSurplus.put(hklsxx.getHkriqi(), zerBigDecimal);
+                        }else {
+                            hkjihua.setZcjmfaxi(sjmBigDecimal.setScale(2,RoundingMode.HALF_UP));
+                            if (hkjihua.getYhwyj().compareTo(hkjihua.getShihwyjn().add(sjmBigDecimal))==0) {
+                                hkjihua.setDqsfjqbz(E_SHIFOUBZ.YES);
+                            }
+                            mapjmSurplus.put(hklsxx.getHkriqi(), jmBigDecimal.subtract(sjmBigDecimal));
+                        }
+                        Yizhi_hkjihuaDao.updateOne_odb2(hkjihua);
+                    }else if (hkjihua.getHkriqi().equals(hklsxx.getHkriqi())&&E_DQJMFS.GUAQ==hklsxx.getDanqjmfs()) {
+                        gqBigDecimal=mapgqSurplus.get(hkjihua.getHkriqi());
+                        BigDecimal sgqBigDecimal=hkjihua.getYhwyj().subtract(hkjihua.getShihwyjn());
+                        if (gqBigDecimal.compareTo(sgqBigDecimal)<=0) {
+                            hkjihua.setWyjguaqi(gqBigDecimal.setScale(2,RoundingMode.HALF_UP));
+//
+                            mapGQHkjihua.put(hkjihua.getOrderno()+"-"+hkjihua.getQici(), hkjihua);
+                            mapgqSurplus.put(hklsxx.getHkriqi(), zerBigDecimal);
+                        }else {
+                            hkjihua.setWyjguaqi(sgqBigDecimal.setScale(2,RoundingMode.HALF_UP));
+//
+                            mapGQHkjihua.put(hkjihua.getOrderno()+"-"+hkjihua.getQici(), hkjihua);
+                            mapgqSurplus.put(hklsxx.getHkriqi(), gqBigDecimal.subtract(sgqBigDecimal));//预挂起溢出废弃
+                        }
+                        Yizhi_hkjihuaDao.updateOne_odb2(hkjihua);
+                    }
+                }
+                //保留最后一期更改
+                if (hkjihua.getQici().equals(lstHkjihua.get(lstHkjihua.size()-1).getQici())) {
+                    mapWHkjihua.put(hkjihua.getOrderno()+"-"+hkjihua.getQici(), hkjihua);
+                }
+            }
+
+        }
+        //最后一期还清挂起期次
+        yizhi_hkjihua lastHkjihua=mapWHkjihua.get(sOrderNo+"-"+lstHkjihua.get(lstHkjihua.size()-1).getQici());
+        BigDecimal yijiaoBigDecimal=lastHkjihua.getYijiaok();
+        if (yijiaoBigDecimal.compareTo(zerBigDecimal)>0) {
+            for (Map.Entry<String, yizhi_hkjihua> mapEntryhkjihua : mapGQHkjihua.entrySet()) {
+                yizhi_hkjihua hkjihua=mapEntryhkjihua.getValue();
+                yijiaoBigDecimal=yijiaoBigDecimal.subtract(hkjihua.getWyjguaqi());
+                if (yijiaoBigDecimal.compareTo(zerBigDecimal)>=0) {
+                    hkjihua.setDqsfjqbz(E_SHIFOUBZ.YES);
+                    Yizhi_hkjihuaDao.updateOne_odb2(hkjihua);
+                }
+            }
+            //剩余溢缴款记录
+            if (yijiaoBigDecimal.compareTo(zerBigDecimal)>0) {
+                lastHkjihua.setYijiaok(yijiaoBigDecimal);
+            }
+        }
+        //最后一期还清挂起期次
+
+        //统计溢缴减免
+        BigDecimal jmBigDecimal=zerBigDecimal;
+        BigDecimal gqBigDecimal=zerBigDecimal;
+        for (Map.Entry<String,BigDecimal> jmEntry : mapjmSurplus.entrySet()) {
+            jmBigDecimal=jmBigDecimal.add(jmEntry.getValue());
+        }
+        //统计溢缴挂起
+        for (Map.Entry<String,BigDecimal> gqEntry : mapgqSurplus.entrySet()) {
+            gqBigDecimal=gqBigDecimal.add(gqEntry.getValue());
+        }
+        lastHkjihua.setYjwyjnjm(jmBigDecimal);
+        lastHkjihua.setYjwyjngq(gqBigDecimal);
+        Yizhi_hkjihuaDao.updateOne_odb2(lastHkjihua);
+    }
+
+
+			 bizlog.method("BusiProcess  end <<<<<<<<<<<<<<<<<<<<");
+
+
+
+}
 
 
 
