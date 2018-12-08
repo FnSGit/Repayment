@@ -3,7 +3,6 @@ package com.fs.pool;
 import com.fs.busi.BusiProcess;
 import com.fs.group.Group;
 import com.fs.task.Task;
-import com.fs.task.TaskVariable;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -46,10 +45,9 @@ public class TaskExecutor {
             executorService.execute(task);
     }
 
-    public void batchExecute(List<Group> groupList, BusiProcess process, TaskVariable variable) {
+    public void batchExecute(List<Group> groupList, BusiProcess process) {
         for (Group group : groupList) {
-            Task task = new Task(process,variable);
-            task.setGroup(group);
+            Task task = new Task(process,group);
             executorService.execute(task);
         }
     }

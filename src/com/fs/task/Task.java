@@ -5,7 +5,6 @@ import com.fs.group.Group;
 import com.fs.util.log.FsLogger;
 
 import java.io.File;
-import java.util.List;
 
 public  class Task implements Runnable{
     protected  String taskName;
@@ -13,27 +12,30 @@ public  class Task implements Runnable{
     protected Group group;
     protected TaskVariable variable;
 
-    protected List<Group> groups;
-    public Task( BusiProcess process,TaskVariable taskVariable) {
-       this.taskName = process.busiName;
-       this.process=process;
-       this.variable=taskVariable;
+
+    public Task(BusiProcess process,Group group) {
+        this.process = process;
+        this.taskName = process.busiName;
+        this.variable=process.getVariable();
+        this.group=group;
     }
 
-    public Task(BusiProcess process, Group groups) {
-        this.taskName = process.busiName;
-        this.process=process;
-        this.group = groups;
-    }
     @Override
     public void run() {
-        //初始化
+        /*
+        初始化
+         */
         FsLogger logger = FsLogger.getLogger(taskName);
         logger.setLogPath("log"+File.separator+ taskName);
-
+        /*
+        任务开始
+         */
        start();
         process.process(process.getProcessData(group));
        end();
+       /*
+       任务结束
+        */
     }
 
     private void end() {

@@ -25,8 +25,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-import static com.fs.entity.staticData.PayPlanStatic.firstDays;
-import static com.fs.entity.staticData.PayPlanStatic.lstHkjh;
 import static com.fs.util.date.DateUtil.getNextDate;
 
 
@@ -299,7 +297,7 @@ public class RepayTool {
         if(qdfFs==JihuaParam.feeFs2){
             double qdffSum=fkje * (qdffLv / 100.0D) *budgetEntity.getQixian();
             double qdffCharged=0;
-            for (YizhiHkjihuaObj hkjh : lstHkjh) {
+            for (YizhiHkjihuaObj hkjh : RepaymentVariable.variable.get().lstHkjh) {
                 qdffCharged+=Double.parseDouble(hkjh.getYhqdffee());
             }
             qdffee=qdffSum-qdffCharged;
@@ -311,7 +309,7 @@ public class RepayTool {
         if (fwfFs == JihuaParam.feeFs2) {
             double fwfSum = fkje * (fwfLv / 100.0D) * qixian;
             double fwfCharged = 0;
-            for (YizhiHkjihuaObj hkjh : lstHkjh) {
+            for (YizhiHkjihuaObj hkjh : RepaymentVariable.variable.get().lstHkjh) {
                 fwfCharged += Double.parseDouble(hkjh.getYhfwfee());
             }
             fwfee = fwfSum - fwfCharged;
@@ -356,19 +354,19 @@ public class RepayTool {
                 lixiDengFen=lixiSum/canShu;//每份利息
                 switch (qiciSegment) {
                     case JihuaParam.qiciShouQi:
-                        firstDays=days;//记录第一期天数
+                        RepaymentVariable.variable.get().firstDays=days;//记录第一期天数
 //							lixi=lixiDengFen*(firstDays/2*((daysSum+(firstDays-1)*-1)+daysSum));
                         restDays=daysSum;
-                        for (int i=0;i<firstDays;i++){
+                        for (int i=0;i<RepaymentVariable.variable.get().firstDays;i++){
                             lixi=lixi+lixiDengFen*restDays;
                             restDays--;
                         }
                         break;
                     case JihuaParam.qiciMoQi:
 //							lixi=lixiDengFen*((30-firstDays)/2*((30-firstDays)+1));
-                        restDays=30-firstDays;
+                        restDays=30-RepaymentVariable.variable.get().firstDays;
 
-                        for (int i = 0; i <30-firstDays; i++) {
+                        for (int i = 0; i <30-RepaymentVariable.variable.get().firstDays; i++) {
                             lixi=lixi+lixiDengFen*restDays;
                             restDays--;
                         }
@@ -376,7 +374,7 @@ public class RepayTool {
                     case JihuaParam.qiciZhongQi:
 //							long firstTerm=firstDays+1+((qici-1)*30);//每期的首项
 //							lixi=lixiDengFen*(30/2*((daysSum+(firstTerm-1)*-1)+(daysSum+(firstTerm+30-1)*-1)));
-                        long firstTerm=firstDays+((qiciNext)*30);
+                        long firstTerm=RepaymentVariable.variable.get().firstDays+((qiciNext)*30);
                         restDays=daysSum- firstTerm;//每期开始剩余天数
                         for (int i = 0; i < 30; i++) {
                             lixi=lixi+lixiDengFen*restDays;
@@ -409,14 +407,14 @@ public class RepayTool {
                 canShu=(daysSum+1)*(daysSum/2);//等份参数
                 lixiDengFen=lixiSum/canShu;//每份利息
                 if(qiciSegment==JihuaParam.qiciShouQi){
-                    firstDays=30;//每期30天计息
+                    RepaymentVariable.variable.get().firstDays=30;//每期30天计息
                     restDays=daysSum;
-                    for (int i=0;i<firstDays;i++){
+                    for (int i=0;i<RepaymentVariable.variable.get().firstDays;i++){
                         lixi=lixi+lixiDengFen*restDays;
                         restDays--;
                     }
                 }else{
-                    long firstTerm=firstDays+((qiciNext)*30);
+                    long firstTerm=RepaymentVariable.variable.get().firstDays+((qiciNext)*30);
                     restDays=daysSum- firstTerm;//每期开始剩余天数
                     for (int i = 0; i < 30; i++) {
                         lixi=lixi+lixiDengFen*restDays;
@@ -434,7 +432,7 @@ public class RepayTool {
             case JihuaParam.specialPro1:
                 lixiSum=fkje*lilv/100*qixian;
                 double lixiCharged=0;
-                for (YizhiHkjihuaObj hkjh : lstHkjh) {
+                for (YizhiHkjihuaObj hkjh : RepaymentVariable.variable.get().lstHkjh) {
                     lixiCharged+=Double.parseDouble(hkjh.getYinghklx());
                 }
                 lixi=lixiSum-lixiCharged;
@@ -450,7 +448,7 @@ public class RepayTool {
                         canShu=(daysSum+1)*(daysSum/2);//等份参数
                         lixiDengFen=lixiSum/canShu;//每份利息
                         lixi=0;
-                        long firstTerm=firstDays+((qiciNext)*30);
+                        long firstTerm=RepaymentVariable.variable.get().firstDays+((qiciNext)*30);
                         restDays=daysSum- firstTerm;//每期开始剩余天数
                         for (int i = 0; i < days; i++) {
                             lixi=lixi+lixiDengFen*restDays;
@@ -517,7 +515,7 @@ public class RepayTool {
         switch (benjinEntity.getSpecialPro()) {
             case JihuaParam.specialPro1:case JihuaParam.specialPro2:
                 double benjCharged=0;
-                for (YizhiHkjihuaObj hkjh : lstHkjh) {
+                for (YizhiHkjihuaObj hkjh : RepaymentVariable.variable.get().lstHkjh) {
                     benjCharged+=Double.parseDouble(hkjh.getYinghkbj());
                 }
                 return fkje-benjCharged;
@@ -647,7 +645,7 @@ public class RepayTool {
         hkjihua.setYhfwfee((new BigDecimal(budgetEntity.getFwfee())).setScale(2, RoundingMode.HALF_UP).toString());
         hkjihua.setYhqdffee((new BigDecimal(budgetEntity.getQdffee())).setScale(2, RoundingMode.HALF_UP).toString());
 
-        lstHkjh.add(hkjihua);
+        RepaymentVariable.variable.get().lstHkjh.add(hkjihua);
     }
     private String getLastRiqi(DateParam riqiParam){
         String jsrq="";
@@ -668,7 +666,7 @@ public class RepayTool {
 
 
 
-    public static BigDecimal calWyjin(PayParam payParam, String hkr, String yhr,int qici,HolidayDao holidayDao, RepaymentVariable variable) {
+    public static BigDecimal calWyjin(PayParam payParam, String hkr, String yhr,int qici,HolidayDao holidayDao) {
         double fkje=payParam.getFkje();
         int jixiFs=payParam.getJixiFs();
         int kouxiFs=payParam.getKouxiFs();
@@ -707,12 +705,12 @@ public class RepayTool {
              * 若确实产生违约金则记录上次违约金日期
              */
 
-            if (hkr.compareTo(variable.payedWyjRiqi) > 0) {
-                if (yhr.compareTo(variable.payedWyjRiqi) < 0)
-                    days = DateUtil.calDateDiff( variable.payedWyjRiqi,hkr);
+            if (hkr.compareTo(RepaymentVariable.variable.get().payedWyjRiqi) > 0) {
+                if (yhr.compareTo(RepaymentVariable.variable.get().payedWyjRiqi) < 0)
+                    days = DateUtil.calDateDiff( RepaymentVariable.variable.get().payedWyjRiqi,hkr);
 
                 bigWyj = BigDecimal.valueOf(fkje * 0.001 * days).setScale(2, RoundingMode.HALF_UP);
-                variable.payedWyjRiqi = hkr;
+                RepaymentVariable.variable.get().payedWyjRiqi = hkr;
             } else {
                 return bigZero;
             }

@@ -24,7 +24,7 @@ public class Test {
 
 //        DataBase.Prepare();
 ////        executor.execute(task1);
-         executor.batchExecute(group.groupParamBuild(),process,variable);
+         executor.batchExecute(group.groupParamBuild(),process);
 
 
         executor.shutdown();

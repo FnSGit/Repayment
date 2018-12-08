@@ -1,6 +1,6 @@
 package com.fs.task;
 
-public class TaskVariable {
+public abstract class TaskVariable {
 
     public String taskName;
     public String dbpool;
@@ -9,4 +9,5 @@ public class TaskVariable {
         this.taskName = taskName;
         this.dbpool = dbpool;
     }
+
 }

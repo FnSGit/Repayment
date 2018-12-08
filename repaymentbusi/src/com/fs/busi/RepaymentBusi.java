@@ -89,7 +89,7 @@ public class RepaymentBusi extends BusiProcess {
         PayPlan plan = new PayPlan(dbpool,statement);
         List<YizhiHkjihuaObj> lstHkjihua= plan.getPayPlan(fkxx);
         plan.insertPlan(lstHkjihua,fkxx);
-
+        plan.payDetail(lstHkjihua,fkxx);
 
     }
 }
