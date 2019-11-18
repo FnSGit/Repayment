@@ -27,7 +27,7 @@ public class GenerateEntity {
 			e.printStackTrace();
 		}
 		
-//		stringBuilder.append("package cc.rengu.fengs.generate.entity;").append(System.lineSeparator());
+
 		stringBuilder.append("public class ").append(StringUtil.lineToHump1(tableName.toLowerCase())).append("Obj  {").append(System.lineSeparator());
 		for (String colomn : colomnList) {
 			stringBuilder.append("	private String " + StringUtil.lineToHump(colomn) + ";").append(System.lineSeparator());
